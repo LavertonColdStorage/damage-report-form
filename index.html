@@ -370,8 +370,13 @@
             }
         };
 
-        // Set today's date
-        document.getElementById("submissionDate").valueAsDate = new Date();
+        // Set today's date (LOCAL time, not UTC — avoids off-by-one-day bug overnight)
+        function setSubmissionDateToToday() {
+            document.getElementById("submissionDate").value = new Date().toLocaleDateString("en-CA");
+        }
+        setSubmissionDateToToday();
+        // Refresh the date if the tab was left open overnight and user returns
+        window.addEventListener("pageshow", setSubmissionDateToToday);
 
         // Cascading dropdown for Equipment ID (based on Site + Equipment Type)
         function updateEquipmentIdDropdown() {
@@ -480,7 +485,7 @@
                 // Clear form after 2 seconds
                 setTimeout(() => {
                     document.getElementById("damageForm").reset();
-                    document.getElementById("submissionDate").valueAsDate = new Date();
+                    setSubmissionDateToToday();
                     photoPreview.style.display = "none";
                     photoImage.src = "";
                     document.getElementById("successMessage").style.display = "none";
@@ -512,7 +517,7 @@
         // Cancel button
         document.getElementById("cancelBtn").addEventListener("click", function() {
             document.getElementById("damageForm").reset();
-            document.getElementById("submissionDate").valueAsDate = new Date();
+            setSubmissionDateToToday();
             photoPreview.style.display = "none";
             photoImage.src = "";
             document.getElementById("errorMessage").classList.remove("show");
