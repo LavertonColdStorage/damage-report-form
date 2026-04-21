@@ -110,9 +110,13 @@
         }
 
         #photoInput {
-            display: none !important;
             position: absolute;
+            top: -9999px;
             left: -9999px;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .camera-button {
@@ -267,7 +271,7 @@
             <form id="damageForm">
                 <!-- Name -->
                 <div class="form-group">
-                    <label for="name" class="required">Report Name</label>
+                    <label for="name" class="required">Name</label>
                     <input type="text" id="name" name="name" placeholder="e.g., Reach Damage - 21 Apr" required>
                     <div class="info-text">Brief description of the damage incident</div>
                 </div>
@@ -318,7 +322,7 @@
                     <label for="photo">Photo</label>
                     <div class="camera-section">
                         <button type="button" class="camera-button" id="cameraButton">📷 Take Photo</button>
-                        <input type="file" id="photoInput" accept="image/*" capture="environment" style="display: none;">
+                        <input type="file" id="photoInput" accept="image/*" capture="environment">
                         <div class="photo-preview" id="photoPreview">
                             <img id="photoImage" src="" alt="Photo preview">
                             <button type="button" class="remove-photo" id="removePhoto">Remove Photo</button>
@@ -385,26 +389,11 @@
         const photoImage = document.getElementById("photoImage");
         const removePhotoBtn = document.getElementById("removePhoto");
 
-        function triggerPhotoInput() {
-            // Make sure the input is visible briefly on iOS
-            photoInput.style.display = "block";
-            photoInput.click();
-            // Hide it again
-            setTimeout(() => {
-                photoInput.style.display = "none";
-            }, 100);
-        }
-
+        // Simple click handler for camera button
         cameraButton.addEventListener("click", function(e) {
             e.preventDefault();
-            triggerPhotoInput();
+            photoInput.click();
         });
-
-        // Also trigger on touch for better iOS support
-        cameraButton.addEventListener("touchstart", function(e) {
-            e.preventDefault();
-            triggerPhotoInput();
-        }, { passive: false });
 
         photoInput.addEventListener("change", function(e) {
             const file = e.target.files[0];
