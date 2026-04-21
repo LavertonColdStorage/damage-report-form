@@ -452,28 +452,57 @@
                 return;
             }
 
-            // Log the data (in a real implementation, this would submit to SharePoint/API)
-            console.log("Damage Report Submitted:", formData);
+            // Submit to Cloudflare Worker
+            const workerUrl = "https://damage-report-api.matthew-rowe1982.workers.dev";
 
-            // Show success message
-            document.getElementById("successMessage").style.display = "block";
+            fetch(workerUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Show success message
+                document.getElementById("successMessage").textContent = "Report submitted to SharePoint successfully!";
+                document.getElementById("successMessage").style.display = "block";
 
-            // Store in localStorage as backup
-            const reports = JSON.parse(localStorage.getItem("damageReports") || "[]");
-            reports.push({
-                ...formData,
-                submittedAt: new Date().toISOString()
+                // Store in localStorage as backup
+                const reports = JSON.parse(localStorage.getItem("damageReports") || "[]");
+                reports.push({
+                    ...formData,
+                    submittedAt: new Date().toISOString(),
+                    sharePointId: data.itemId
+                });
+                localStorage.setItem("damageReports", JSON.stringify(reports));
+
+                // Clear form after 2 seconds
+                setTimeout(() => {
+                    document.getElementById("damageForm").reset();
+                    document.getElementById("submissionDate").valueAsDate = new Date();
+                    photoPreview.style.display = "none";
+                    photoImage.src = "";
+                    document.getElementById("successMessage").style.display = "none";
+                }, 2000);
+            })
+            .catch(error => {
+                showError("Error submitting report: " + error.message + ". Data saved locally.");
+
+                // Store in localStorage as fallback
+                const reports = JSON.parse(localStorage.getItem("damageReports") || "[]");
+                reports.push({
+                    ...formData,
+                    submittedAt: new Date().toISOString(),
+                    status: "pending"
+                });
+                localStorage.setItem("damageReports", JSON.stringify(reports));
             });
-            localStorage.setItem("damageReports", JSON.stringify(reports));
-
-            // Clear form after 2 seconds
-            setTimeout(() => {
-                document.getElementById("damageForm").reset();
-                document.getElementById("submissionDate").valueAsDate = new Date();
-                photoPreview.style.display = "none";
-                photoImage.src = "";
-                document.getElementById("successMessage").style.display = "none";
-            }, 2000);
         });
 
         // Cancel button
