@@ -109,7 +109,7 @@
             text-align: center;
         }
 
-        #photoInput {
+        #photoInput, #photoUploadInput {
             position: absolute;
             top: -9999px;
             left: -9999px;
@@ -119,24 +119,41 @@
             pointer-events: none;
         }
 
-        .camera-button {
-            background: #27ae60;
+        .photo-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .camera-button, .upload-button {
+            flex: 1 1 140px;
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: 12px 18px;
             border-radius: 6px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
-            width: 100%;
+            transition: background 0.2s;
+        }
+
+        .camera-button {
+            background: #27ae60;
         }
 
         .camera-button:hover {
             background: #229954;
         }
 
-        .camera-button:disabled {
+        .upload-button {
+            background: #3b82f6;
+        }
+
+        .upload-button:hover {
+            background: #1e40af;
+        }
+
+        .camera-button:disabled, .upload-button:disabled {
             background: #95a5a6;
             cursor: not-allowed;
         }
@@ -237,6 +254,21 @@
             margin-top: 4px;
         }
 
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #1e40af;
+            text-decoration: none;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 600px) {
             .header {
                 padding: 20px;
@@ -265,6 +297,7 @@
         </div>
 
         <div class="content">
+            <a href="../" class="back-link">&larr; Back to all reports</a>
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage">Report submitted successfully!</div>
 
@@ -321,8 +354,12 @@
                 <div class="form-group">
                     <label for="photoInput">Photo</label>
                     <div class="camera-section">
-                        <button type="button" class="camera-button" id="cameraButton">📷 Take Photo</button>
+                        <div class="photo-buttons">
+                            <button type="button" class="camera-button" id="cameraButton">📷 Take Photo</button>
+                            <button type="button" class="upload-button" id="uploadButton">📁 Upload Photo</button>
+                        </div>
                         <input type="file" id="photoInput" accept="image/*" capture="environment">
+                        <input type="file" id="photoUploadInput" accept="image/*">
                         <div class="photo-preview" id="photoPreview">
                             <img id="photoImage" src="" alt="Photo preview">
                             <button type="button" class="remove-photo" id="removePhoto">Remove Photo</button>
@@ -405,20 +442,17 @@
         document.getElementById("equipmentType").addEventListener("change", updateEquipmentIdDropdown);
         document.getElementById("equipmentType").addEventListener("input", updateEquipmentIdDropdown);
 
-        // Camera functionality
+        // Camera + upload functionality
         const cameraButton = document.getElementById("cameraButton");
+        const uploadButton = document.getElementById("uploadButton");
         const photoInput = document.getElementById("photoInput");
+        const photoUploadInput = document.getElementById("photoUploadInput");
         const photoPreview = document.getElementById("photoPreview");
         const photoImage = document.getElementById("photoImage");
         const removePhotoBtn = document.getElementById("removePhoto");
 
-        // Simple click handler for camera button
-        cameraButton.addEventListener("click", function(e) {
-            e.preventDefault();
-            photoInput.click();
-        });
-
-        photoInput.addEventListener("change", function(e) {
+        // Shared handler for whichever input fires a "change"
+        function handlePhotoSelected(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
@@ -428,11 +462,27 @@
                 };
                 reader.readAsDataURL(file);
             }
+        }
+
+        // Upload button -> open file picker (no camera)
+        uploadButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            photoUploadInput.click();
         });
+        photoUploadInput.addEventListener("change", handlePhotoSelected);
+
+        // Simple click handler for camera button
+        cameraButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            photoInput.click();
+        });
+
+        photoInput.addEventListener("change", handlePhotoSelected);
 
         removePhotoBtn.addEventListener("click", function(e) {
             e.preventDefault();
             photoInput.value = "";
+            photoUploadInput.value = "";
             photoPreview.style.display = "none";
             photoImage.src = "";
         });
