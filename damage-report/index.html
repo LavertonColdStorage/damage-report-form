@@ -454,14 +454,27 @@
         // Shared handler for whichever input fires a "change"
         function handlePhotoSelected(e) {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    photoImage.src = event.target.result;
-                    photoPreview.style.display = "block";
-                };
-                reader.readAsDataURL(file);
+            if (!file) return;
+
+            // Reject anything that isn't actually an image (iOS lets users pick ANY file,
+            // regardless of the accept attribute)
+            const isImage = file.type && file.type.startsWith("image/");
+            const hasImageExtension = /\.(jpe?g|png|gif|heic|heif|webp|bmp)$/i.test(file.name || "");
+            if (!isImage && !hasImageExtension) {
+                showError("Only photo files are allowed (JPG, PNG, HEIC). Please choose an image.");
+                e.target.value = "";
+                return;
             }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                photoImage.src = event.target.result;
+                photoPreview.style.display = "block";
+                // Clear any previous error once a valid photo lands
+                const err = document.getElementById("errorMessage");
+                if (err) { err.classList.remove("show"); err.style.display = "none"; }
+            };
+            reader.readAsDataURL(file);
         }
 
         // Upload button -> open file picker (no camera)
