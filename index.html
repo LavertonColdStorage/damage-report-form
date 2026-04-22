@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Damage Report - Laverton Cold Storage</title>
+    <title>Laverton Cold Storage - Reports</title>
     <style>
         * {
             margin: 0;
@@ -12,576 +12,227 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             min-height: 100vh;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            color: #1f2937;
         }
 
         .container {
+            max-width: 800px;
+            margin: 0 auto;
             background: white;
             border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             color: white;
-            padding: 40px 20px;
+            padding: 32px 24px;
             text-align: center;
-        }
-
-        .header img {
-            max-width: 100%;
-            height: auto;
         }
 
         .header h1 {
-            font-size: 28px;
-            margin-bottom: 5px;
-            margin-top: 0;
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
         }
 
         .header p {
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 15px;
+            opacity: 0.92;
         }
 
         .content {
-            padding: 30px;
+            padding: 28px 24px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #2c3e50;
-            font-size: 14px;
-        }
-
-        .required::after {
-            content: " *";
-            color: #e74c3c;
-        }
-
-        input[type="text"],
-        input[type="date"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ecf0f1;
-            border-radius: 6px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus,
-        input[type="date"]:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .camera-section {
-            margin: 20px 0;
-            padding: 20px;
-            background: #ecf0f1;
-            border-radius: 8px;
+        .intro {
             text-align: center;
+            color: #4b5563;
+            font-size: 15px;
+            margin-bottom: 24px;
         }
 
-        #photoInput, #photoUploadInput {
-            position: absolute;
-            top: -9999px;
-            left: -9999px;
-            width: 0;
-            height: 0;
-            opacity: 0;
-            pointer-events: none;
+        .tiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
         }
 
-        .photo-buttons {
+        .tile {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            justify-content: space-between;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 24px 20px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.15s ease;
+            min-height: 170px;
+            position: relative;
         }
 
-        .camera-button, .upload-button {
-            flex: 1 1 140px;
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
+        .tile.active {
+            background: white;
+            border-color: #3b82f6;
         }
 
-        .camera-button {
-            background: #27ae60;
+        .tile.active:hover,
+        .tile.active:focus {
+            background: #eff6ff;
+            border-color: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.15);
         }
 
-        .camera-button:hover {
-            background: #229954;
-        }
-
-        .upload-button {
-            background: #3b82f6;
-        }
-
-        .upload-button:hover {
-            background: #1e40af;
-        }
-
-        .camera-button:disabled, .upload-button:disabled {
-            background: #95a5a6;
+        .tile.coming-soon {
+            background: #f3f4f6;
+            border-color: #e5e7eb;
+            color: #9ca3af;
             cursor: not-allowed;
         }
 
-        .photo-preview {
-            margin-top: 15px;
-            display: none;
+        .tile-icon {
+            font-size: 42px;
+            line-height: 1;
+            margin-bottom: 12px;
         }
 
-        .photo-preview img {
-            max-width: 100%;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-
-        .remove-photo {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        .remove-photo:hover {
-            background: #c0392b;
-        }
-
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-
-        .submit-btn {
-            flex: 1;
-            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 6px;
-            font-size: 16px;
+        .tile-title {
+            font-size: 18px;
             font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
+            margin-bottom: 6px;
+            color: #111827;
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        .tile.coming-soon .tile-title {
+            color: #6b7280;
         }
 
-        .cancel-btn {
-            flex: 1;
-            background: #95a5a6;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 6px;
-            font-size: 16px;
+        .tile-desc {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 8px;
+            border-radius: 10px;
+        }
+
+        .badge-live {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-soon {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tile-cta {
+            margin-top: 14px;
+            font-size: 13px;
             font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .cancel-btn:hover {
-            background: #7f8c8d;
-        }
-
-        .success-message {
-            display: none;
-            background: #d4edda;
-            color: #155724;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 15px;
-            border: 1px solid #f5c6cb;
-            display: none;
-        }
-
-        .error-message.show {
-            display: block;
-        }
-
-        .info-text {
-            font-size: 12px;
-            color: #7f8c8d;
-            margin-top: 4px;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
             color: #1e40af;
-            text-decoration: none;
-            margin-bottom: 18px;
-            font-weight: 500;
         }
 
-        .back-link:hover {
-            text-decoration: underline;
+        .tile.coming-soon .tile-cta {
+            color: #9ca3af;
         }
 
-        @media (max-width: 600px) {
-            .header {
-                padding: 20px;
-            }
+        .footer {
+            text-align: center;
+            padding: 16px 24px 24px;
+            font-size: 12px;
+            color: #9ca3af;
+            border-top: 1px solid #f3f4f6;
+        }
 
-            .header h1 {
-                font-size: 22px;
-            }
-
-            .content {
-                padding: 20px;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
+        @media (max-width: 500px) {
+            .header h1 { font-size: 22px; }
+            .tile { min-height: 150px; padding: 20px 16px; }
+            .tile-icon { font-size: 36px; }
+            .tile-title { font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <img src="Chilled-LavertonCS-1.png" alt="Laverton Cold Storage" style="max-width: 280px; height: auto; margin-bottom: 20px;">
-            <h1>Damage Report</h1>
-            <p>Equipment Damage Incident Form</p>
+            <h1>Laverton Cold Storage</h1>
+            <p>Reports &amp; Checklists</p>
         </div>
 
         <div class="content">
-            <a href="../" class="back-link">&larr; Back to all reports</a>
-            <div class="error-message" id="errorMessage"></div>
-            <div class="success-message" id="successMessage">Report submitted successfully!</div>
+            <p class="intro">Select the report you want to submit</p>
 
-            <form id="damageForm">
-                <!-- Submitted By -->
-                <div class="form-group">
-                    <label for="name" class="required">Name</label>
-                    <input type="text" id="name" name="name" placeholder="e.g., Matt Rowe" required>
-                    <div class="info-text">Person submitting this report</div>
-                </div>
+            <div class="tiles">
 
-                <!-- Site -->
-                <div class="form-group">
-                    <label for="site" class="required">Site</label>
-                    <select id="site" name="site" required>
-                        <option value="">-- Select Site --</option>
-                        <option value="Leakes Rd">Leakes Rd</option>
-                        <option value="Foundation Rd">Foundation Rd</option>
-                    </select>
-                </div>
-
-                <!-- Equipment Type -->
-                <div class="form-group">
-                    <label for="equipmentType" class="required">Equipment Type</label>
-                    <select id="equipmentType" name="equipmentType" required>
-                        <option value="">-- Select Equipment Type --</option>
-                        <option value="Reach">Reach</option>
-                        <option value="Forklift">Forklift</option>
-                        <option value="Tugger">Tugger</option>
-                        <option value="Electric Pallet Jack">Electric Pallet Jack</option>
-                        <option value="Robot">Robot</option>
-                        <option value="Airlock Doors">Airlock Doors</option>
-                        <option value="Wrappers">Wrappers</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <!-- Equipment ID -->
-                <div class="form-group">
-                    <label for="equipmentId" class="required">Equipment ID</label>
-                    <select id="equipmentId" name="equipmentId" required>
-                        <option value="">-- Select Equipment Type First --</option>
-                    </select>
-                    <div class="info-text">Filtered based on Equipment Type selection</div>
-                </div>
-
-                <!-- Issue Description -->
-                <div class="form-group">
-                    <label for="issueDescription" class="required">Issue Description</label>
-                    <textarea id="issueDescription" name="issueDescription" placeholder="Describe the damage, where it occurred, and any relevant details..." required></textarea>
-                </div>
-
-                <!-- Photo -->
-                <div class="form-group">
-                    <label for="photoInput">Photo</label>
-                    <div class="camera-section">
-                        <div class="photo-buttons">
-                            <button type="button" class="camera-button" id="cameraButton">📷 Take Photo</button>
-                            <button type="button" class="upload-button" id="uploadButton">📁 Upload Photo</button>
-                        </div>
-                        <input type="file" id="photoInput" accept="image/*" capture="environment">
-                        <input type="file" id="photoUploadInput" accept="image/*">
-                        <div class="photo-preview" id="photoPreview">
-                            <img id="photoImage" src="" alt="Photo preview">
-                            <button type="button" class="remove-photo" id="removePhoto">Remove Photo</button>
-                        </div>
+                <!-- Damage Report - ACTIVE -->
+                <a href="damage-report/" class="tile active">
+                    <span class="badge badge-live">Live</span>
+                    <div>
+                        <div class="tile-icon">&#128680;</div>
+                        <div class="tile-title">Damage Report</div>
+                        <div class="tile-desc">Report damaged equipment (reach, forklift, doors, etc.)</div>
                     </div>
+                    <div class="tile-cta">Start report &rarr;</div>
+                </a>
+
+                <!-- End of Shift Checklist - COMING SOON -->
+                <div class="tile coming-soon" role="button" aria-disabled="true">
+                    <span class="badge badge-soon">Coming Soon</span>
+                    <div>
+                        <div class="tile-icon">&#9989;</div>
+                        <div class="tile-title">End of Shift Checklist</div>
+                        <div class="tile-desc">Equipment condition, fuel/charge levels, handover notes</div>
+                    </div>
+                    <div class="tile-cta">Available soon</div>
                 </div>
 
-                <!-- Submission Date -->
-                <div class="form-group">
-                    <label for="submissionDate" class="required">Submission Date</label>
-                    <input type="date" id="submissionDate" name="submissionDate" required>
+                <!-- Container Load Photos - COMING SOON -->
+                <div class="tile coming-soon" role="button" aria-disabled="true">
+                    <span class="badge badge-soon">Coming Soon</span>
+                    <div>
+                        <div class="tile-icon">&#128225;</div>
+                        <div class="tile-title">Container Load Photos</div>
+                        <div class="tile-desc">Photos &amp; details of containers being loaded</div>
+                    </div>
+                    <div class="tile-cta">Available soon</div>
                 </div>
 
-                <!-- Buttons -->
-                <div class="button-group">
-                    <button type="submit" class="submit-btn">Submit Report</button>
-                    <button type="button" class="cancel-btn" id="cancelBtn">Clear</button>
+                <!-- Reworks Report - COMING SOON -->
+                <div class="tile coming-soon" role="button" aria-disabled="true">
+                    <span class="badge badge-soon">Coming Soon</span>
+                    <div>
+                        <div class="tile-icon">&#128736;</div>
+                        <div class="tile-title">Reworks Report</div>
+                        <div class="tile-desc">Log rework jobs, reasons and corrective actions</div>
+                    </div>
+                    <div class="tile-cta">Available soon</div>
                 </div>
-            </form>
+
+            </div>
+        </div>
+
+        <div class="footer">
+            Laverton Cold Storage &middot; Operations Reporting
         </div>
     </div>
-
-    <script>
-        // Equipment ID mapping by Site + Equipment Type
-        const equipmentMap = {
-            "Leakes Rd": {
-                "Reach": ["RMD1305", "RMD1306", "RMD1307", "RMD1308", "RMD1309", "RMD1310", "RMD1311", "RMD1312", "RMD1313", "RMD1314", "RMD1315", "RMD1331", "RMD1335", "RMD1336", "RMD1337"],
-                "Forklift": ["SCP2340 (ss)", "SCP2341 (ss)", "SCP2342", "SCP2343", "SCP2344 (ss)", "SCP2345 (ss)", "SCP2348 (ss)", "SCP2349 (ss)", "SCP2350"],
-                "Tugger": ["PR901S", "PR921S", "PR942", "PR943", "PR944", "PR945", "PR946", "PR947"],
-                "Electric Pallet Jack": ["WP2594", "WP2650"],
-                "Robot": [],
-                "Airlock Doors": [],
-                "Wrappers": [],
-                "Other": ["OTHER"]
-            },
-            "Foundation Rd": {
-                "Reach": ["RMD 113", "RMD 344", "RMD 345", "RMD 347", "RMD 349", "RMD 528", "RMD 647", "RMD 791", "RMD 792", "RMD 794", "RMD 797", "RMD1332", "RMD1333", "RMD1334", "RMD1338", "RMD1339"],
-                "Forklift": ["SS - SCP1661", "SS - SCP1915", "SS - SCP1913", "SS - SCP1916", "SS - SCP1914", "SCP1854", "SCP1889", "SCP1980", "SCP1501", "SCP1891"],
-                "Tugger": ["PR510", "PR606", "PR676", "PR678", "PR913S", "PR943"],
-                "Electric Pallet Jack": ["WP1926", "WP2820", "WP2825"],
-                "Robot": [],
-                "Airlock Doors": [],
-                "Wrappers": [],
-                "Other": ["OTHER"]
-            }
-        };
-
-        // Set today's date (LOCAL time, not UTC — avoids off-by-one-day bug overnight)
-        function setSubmissionDateToToday() {
-            document.getElementById("submissionDate").value = new Date().toLocaleDateString("en-CA");
-        }
-        setSubmissionDateToToday();
-        // Refresh the date if the tab was left open overnight and user returns
-        window.addEventListener("pageshow", setSubmissionDateToToday);
-
-        // Cascading dropdown for Equipment ID (based on Site + Equipment Type)
-        function updateEquipmentIdDropdown() {
-            const site = document.getElementById("site").value;
-            const equipmentType = document.getElementById("equipmentType").value;
-            const equipmentIdSelect = document.getElementById("equipmentId");
-
-            equipmentIdSelect.innerHTML = '<option value="">-- Select Equipment ID --</option>';
-
-            if (site && equipmentType && equipmentMap[site] && equipmentMap[site][equipmentType]) {
-                const equipmentIds = equipmentMap[site][equipmentType];
-                equipmentIds.forEach(id => {
-                    if (id) { // Only add non-empty IDs
-                        const option = document.createElement("option");
-                        option.value = id;
-                        option.textContent = id;
-                        equipmentIdSelect.appendChild(option);
-                    }
-                });
-            }
-        }
-
-        // Update Equipment ID when either Site or Equipment Type changes
-        document.getElementById("site").addEventListener("change", updateEquipmentIdDropdown);
-        document.getElementById("site").addEventListener("input", updateEquipmentIdDropdown);
-        document.getElementById("equipmentType").addEventListener("change", updateEquipmentIdDropdown);
-        document.getElementById("equipmentType").addEventListener("input", updateEquipmentIdDropdown);
-
-        // Camera + upload functionality
-        const cameraButton = document.getElementById("cameraButton");
-        const uploadButton = document.getElementById("uploadButton");
-        const photoInput = document.getElementById("photoInput");
-        const photoUploadInput = document.getElementById("photoUploadInput");
-        const photoPreview = document.getElementById("photoPreview");
-        const photoImage = document.getElementById("photoImage");
-        const removePhotoBtn = document.getElementById("removePhoto");
-
-        // Shared handler for whichever input fires a "change"
-        function handlePhotoSelected(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    photoImage.src = event.target.result;
-                    photoPreview.style.display = "block";
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // Upload button -> open file picker (no camera)
-        uploadButton.addEventListener("click", function(e) {
-            e.preventDefault();
-            photoUploadInput.click();
-        });
-        photoUploadInput.addEventListener("change", handlePhotoSelected);
-
-        // Simple click handler for camera button
-        cameraButton.addEventListener("click", function(e) {
-            e.preventDefault();
-            photoInput.click();
-        });
-
-        photoInput.addEventListener("change", handlePhotoSelected);
-
-        removePhotoBtn.addEventListener("click", function(e) {
-            e.preventDefault();
-            photoInput.value = "";
-            photoUploadInput.value = "";
-            photoPreview.style.display = "none";
-            photoImage.src = "";
-        });
-
-        // Form submission
-        document.getElementById("damageForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            // Only send photo if user actually selected one (photoImage.src defaults
-            // to the page URL when empty, so check for a proper data URI)
-            const hasPhoto = photoImage.src && photoImage.src.startsWith("data:image");
-
-            const formData = {
-                name: document.getElementById("name").value,
-                site: document.getElementById("site").value,
-                equipmentType: document.getElementById("equipmentType").value,
-                equipmentId: document.getElementById("equipmentId").value,
-                issueDescription: document.getElementById("issueDescription").value,
-                submissionDate: document.getElementById("submissionDate").value,
-                photoData: hasPhoto ? photoImage.src : null
-            };
-
-            // Validate required fields
-            if (!formData.name || !formData.site || !formData.equipmentType || !formData.equipmentId || !formData.issueDescription) {
-                showError("Please fill in all required fields.");
-                return;
-            }
-
-            // Submit to Cloudflare Worker
-            const workerUrl = "https://damage-report-api.matthew-rowe1982.workers.dev";
-
-            fetch(workerUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(formData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Show success message
-                document.getElementById("successMessage").textContent = "Report submitted to SharePoint successfully!";
-                document.getElementById("successMessage").style.display = "block";
-
-                // Clear form after 2 seconds
-                setTimeout(() => {
-                    document.getElementById("damageForm").reset();
-                    setSubmissionDateToToday();
-                    photoPreview.style.display = "none";
-                    photoImage.src = "";
-                    document.getElementById("successMessage").style.display = "none";
-                }, 2000);
-            })
-            .catch(error => {
-                showError("Error submitting report: " + error.message + ". Report saved locally (without photo) \u2014 please retry.");
-
-                // Store metadata only (NOT the photo, which is huge) to avoid quota errors.
-                // Capped to last 20 pending entries.
-                try {
-                    const { photoData, ...metadataOnly } = formData;
-                    const reports = JSON.parse(localStorage.getItem("damageReports") || "[]");
-                    reports.push({
-                        ...metadataOnly,
-                        submittedAt: new Date().toISOString(),
-                        status: "pending"
-                    });
-                    // Keep only most recent 20 pending entries
-                    const trimmed = reports.slice(-20);
-                    localStorage.setItem("damageReports", JSON.stringify(trimmed));
-                } catch (storageErr) {
-                    // localStorage full or unavailable \u2014 not critical, ignore
-                    console.warn("Could not save backup:", storageErr);
-                }
-            });
-        });
-
-        // Cancel button
-        document.getElementById("cancelBtn").addEventListener("click", function() {
-            document.getElementById("damageForm").reset();
-            setSubmissionDateToToday();
-            photoPreview.style.display = "none";
-            photoImage.src = "";
-            document.getElementById("errorMessage").classList.remove("show");
-            document.getElementById("successMessage").style.display = "none";
-        });
-
-        function showError(message) {
-            const errorDiv = document.getElementById("errorMessage");
-            errorDiv.textContent = message;
-            errorDiv.classList.add("show");
-            setTimeout(() => {
-                errorDiv.classList.remove("show");
-            }, 5000);
-        }
-    </script>
 </body>
 </html>
