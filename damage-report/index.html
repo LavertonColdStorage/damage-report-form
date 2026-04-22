@@ -383,8 +383,10 @@
     </div>
 
     <script>
-        // Equipment ID mapping by Site + Equipment Type
-        const equipmentMap = {
+        // Equipment register is fetched from the SharePoint Equipment Register list
+        // via the Cloudflare Worker on page load. This fallback map is used only if
+        // the fetch fails (network issue, worker down, etc.) so users can still submit.
+        const FALLBACK_EQUIPMENT_MAP = {
             "Leakes Rd": {
                 "Reach": ["RMD1305", "RMD1306", "RMD1307", "RMD1308", "RMD1309", "RMD1310", "RMD1311", "RMD1312", "RMD1313", "RMD1314", "RMD1315", "RMD1331", "RMD1335", "RMD1336", "RMD1337"],
                 "Forklift": ["SCP2340 (ss)", "SCP2341 (ss)", "SCP2342", "SCP2343", "SCP2344 (ss)", "SCP2345 (ss)", "SCP2348 (ss)", "SCP2349 (ss)", "SCP2350"],
@@ -406,6 +408,38 @@
                 "Other": ["OTHER"]
             }
         };
+
+        // Starts as fallback data; gets replaced with fresh data from SharePoint on load.
+        let equipmentMap = FALLBACK_EQUIPMENT_MAP;
+
+        // Fetch the live equipment register from the worker. If it fails for any
+        // reason we just keep using the fallback map so the form is never broken.
+        const WORKER_URL = "https://damage-report-api.matthew-rowe1982.workers.dev";
+        fetch(WORKER_URL, { method: "GET" })
+            .then(resp => {
+                if (!resp.ok) throw new Error("Non-OK response: " + resp.status);
+                return resp.json();
+            })
+            .then(liveMap => {
+                // Merge so every Equipment Type keeps its key (empty list for no-ID types
+                // like Airlock Doors) even if SharePoint has no rows for it.
+                const merged = JSON.parse(JSON.stringify(FALLBACK_EQUIPMENT_MAP));
+                for (const site of Object.keys(liveMap || {})) {
+                    if (!merged[site]) merged[site] = {};
+                    for (const type of Object.keys(liveMap[site] || {})) {
+                        merged[site][type] = liveMap[site][type];
+                    }
+                }
+                equipmentMap = merged;
+                // If the user already selected site+type before fetch completed, refresh
+                // the Equipment ID dropdown with the new data.
+                if (typeof updateEquipmentIdDropdown === "function") {
+                    updateEquipmentIdDropdown();
+                }
+            })
+            .catch(err => {
+                console.warn("Could not load live equipment register, using fallback:", err);
+            });
 
         // Set today's date (LOCAL time, not UTC — avoids off-by-one-day bug overnight)
         function setSubmissionDateToToday() {
