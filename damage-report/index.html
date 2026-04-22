@@ -420,19 +420,34 @@
             const site = document.getElementById("site").value;
             const equipmentType = document.getElementById("equipmentType").value;
             const equipmentIdSelect = document.getElementById("equipmentId");
+            const equipmentIdInfo = equipmentIdSelect.parentElement.querySelector(".info-text");
 
+            // Reset to default state
             equipmentIdSelect.innerHTML = '<option value="">-- Select Equipment ID --</option>';
+            equipmentIdSelect.disabled = false;
+            equipmentIdSelect.required = true;
+            if (equipmentIdInfo) equipmentIdInfo.textContent = "Filtered based on Equipment Type selection";
 
             if (site && equipmentType && equipmentMap[site] && equipmentMap[site][equipmentType]) {
                 const equipmentIds = equipmentMap[site][equipmentType];
-                equipmentIds.forEach(id => {
-                    if (id) { // Only add non-empty IDs
-                        const option = document.createElement("option");
-                        option.value = id;
-                        option.textContent = id;
-                        equipmentIdSelect.appendChild(option);
-                    }
-                });
+
+                if (equipmentIds.length === 0) {
+                    // Equipment type with no individual IDs (e.g. Airlock Doors, Wrappers)
+                    // — auto-fill N/A and disable the field so user can submit
+                    equipmentIdSelect.innerHTML = '<option value="N/A" selected>N/A - Not Applicable</option>';
+                    equipmentIdSelect.disabled = true;
+                    equipmentIdSelect.required = false;
+                    if (equipmentIdInfo) equipmentIdInfo.textContent = "No individual ID needed for this equipment type";
+                } else {
+                    equipmentIds.forEach(id => {
+                        if (id) { // Only add non-empty IDs
+                            const option = document.createElement("option");
+                            option.value = id;
+                            option.textContent = id;
+                            equipmentIdSelect.appendChild(option);
+                        }
+                    });
+                }
             }
         }
 
