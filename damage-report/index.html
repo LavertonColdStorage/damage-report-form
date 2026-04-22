@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -20,7 +19,6 @@
             justify-content: center;
             align-items: center;
         }
-
         .container {
             background: white;
             border-radius: 12px;
@@ -29,38 +27,31 @@
             width: 100%;
             overflow: hidden;
         }
-
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
             padding: 40px 20px;
             text-align: center;
         }
-
         .header img {
             max-width: 100%;
             height: auto;
         }
-
         .header h1 {
             font-size: 28px;
             margin-bottom: 5px;
             margin-top: 0;
         }
-
         .header p {
             font-size: 14px;
             opacity: 0.9;
         }
-
         .content {
             padding: 30px;
         }
-
         .form-group {
             margin-bottom: 20px;
         }
-
         label {
             display: block;
             font-weight: 600;
@@ -68,12 +59,10 @@
             color: #2c3e50;
             font-size: 14px;
         }
-
         .required::after {
             content: " *";
             color: #e74c3c;
         }
-
         input[type="text"],
         input[type="date"],
         select,
@@ -86,7 +75,6 @@
             font-family: inherit;
             transition: border-color 0.3s;
         }
-
         input[type="text"]:focus,
         input[type="date"]:focus,
         select:focus,
@@ -95,12 +83,10 @@
             border-color: #3498db;
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
-
         textarea {
             resize: vertical;
             min-height: 100px;
         }
-
         .camera-section {
             margin: 20px 0;
             padding: 20px;
@@ -108,7 +94,6 @@
             border-radius: 8px;
             text-align: center;
         }
-
         #photoInput, #photoUploadInput {
             position: absolute;
             top: -9999px;
@@ -118,13 +103,11 @@
             opacity: 0;
             pointer-events: none;
         }
-
         .photo-buttons {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-
         .camera-button, .upload-button {
             flex: 1 1 140px;
             color: white;
@@ -136,39 +119,31 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-
         .camera-button {
             background: #27ae60;
         }
-
         .camera-button:hover {
             background: #229954;
         }
-
         .upload-button {
             background: #3b82f6;
         }
-
         .upload-button:hover {
             background: #1e40af;
         }
-
         .camera-button:disabled, .upload-button:disabled {
             background: #95a5a6;
             cursor: not-allowed;
         }
-
         .photo-preview {
             margin-top: 15px;
             display: none;
         }
-
         .photo-preview img {
             max-width: 100%;
             border-radius: 6px;
             margin-bottom: 10px;
         }
-
         .remove-photo {
             background: #e74c3c;
             color: white;
@@ -178,17 +153,14 @@
             font-size: 12px;
             cursor: pointer;
         }
-
         .remove-photo:hover {
             background: #c0392b;
         }
-
         .button-group {
             display: flex;
             gap: 10px;
             margin-top: 30px;
         }
-
         .submit-btn {
             flex: 1;
             background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
@@ -201,12 +173,24 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
         }
-
+        .submit-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+        .submit-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .submit-btn.submitted {
+            background: #27ae60;
+            font-size: 18px;
+            padding: 20px;
+            opacity: 1;
+        }
         .cancel-btn {
             flex: 1;
             background: #95a5a6;
@@ -219,11 +203,9 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-
         .cancel-btn:hover {
             background: #7f8c8d;
         }
-
         .success-message {
             display: none;
             background: #d4edda;
@@ -233,7 +215,6 @@
             margin-bottom: 20px;
             border: 1px solid #c3e6cb;
         }
-
         .error-message {
             background: #f8d7da;
             color: #721c24;
@@ -243,17 +224,14 @@
             border: 1px solid #f5c6cb;
             display: none;
         }
-
         .error-message.show {
             display: block;
         }
-
         .info-text {
             font-size: 12px;
             color: #7f8c8d;
             margin-top: 4px;
         }
-
         .back-link {
             display: inline-flex;
             align-items: center;
@@ -264,24 +242,19 @@
             margin-bottom: 18px;
             font-weight: 500;
         }
-
         .back-link:hover {
             text-decoration: underline;
         }
-
         @media (max-width: 600px) {
             .header {
                 padding: 20px;
             }
-
             .header h1 {
                 font-size: 22px;
             }
-
             .content {
                 padding: 20px;
             }
-
             .button-group {
                 flex-direction: column;
             }
@@ -295,12 +268,10 @@
             <h1>Damage Report</h1>
             <p>Equipment Damage Incident Form</p>
         </div>
-
         <div class="content">
             <a href="../" class="back-link">&larr; Back to all reports</a>
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage">Report submitted successfully!</div>
-
             <form id="damageForm">
                 <!-- Submitted By -->
                 <div class="form-group">
@@ -308,7 +279,6 @@
                     <input type="text" id="name" name="name" placeholder="e.g., Matt Rowe" required>
                     <div class="info-text">Person submitting this report</div>
                 </div>
-
                 <!-- Site -->
                 <div class="form-group">
                     <label for="site" class="required">Site</label>
@@ -318,7 +288,6 @@
                         <option value="Foundation Rd">Foundation Rd</option>
                     </select>
                 </div>
-
                 <!-- Equipment Type -->
                 <div class="form-group">
                     <label for="equipmentType" class="required">Equipment Type</label>
@@ -334,7 +303,6 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-
                 <!-- Equipment ID -->
                 <div class="form-group">
                     <label for="equipmentId" class="required">Equipment ID</label>
@@ -343,20 +311,18 @@
                     </select>
                     <div class="info-text">Filtered based on Equipment Type selection</div>
                 </div>
-
                 <!-- Issue Description -->
                 <div class="form-group">
                     <label for="issueDescription" class="required">Issue Description</label>
                     <textarea id="issueDescription" name="issueDescription" placeholder="Describe the damage, where it occurred, and any relevant details..." required></textarea>
                 </div>
-
                 <!-- Photo -->
                 <div class="form-group">
                     <label for="photoInput">Photo</label>
                     <div class="camera-section">
                         <div class="photo-buttons">
-                            <button type="button" class="camera-button" id="cameraButton">📷 Take Photo</button>
-                            <button type="button" class="upload-button" id="uploadButton">📁 Upload Photo</button>
+                            <button type="button" class="camera-button" id="cameraButton">&#128247; Take Photo</button>
+                            <button type="button" class="upload-button" id="uploadButton">&#128193; Upload Photo</button>
                         </div>
                         <input type="file" id="photoInput" accept="image/*" capture="environment">
                         <input type="file" id="photoUploadInput" accept="image/*">
@@ -366,13 +332,11 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Submission Date -->
                 <div class="form-group">
                     <label for="submissionDate" class="required">Submission Date</label>
                     <input type="date" id="submissionDate" name="submissionDate" required>
                 </div>
-
                 <!-- Buttons -->
                 <div class="button-group">
                     <button type="submit" class="submit-btn">Submit Report</button>
@@ -381,7 +345,6 @@
             </form>
         </div>
     </div>
-
     <script>
         // Equipment register is fetched from the SharePoint Equipment Register list
         // via the Cloudflare Worker on page load. This fallback map is used only if
@@ -408,10 +371,8 @@
                 "Other": ["OTHER"]
             }
         };
-
         // Starts as fallback data; gets replaced with fresh data from SharePoint on load.
         let equipmentMap = FALLBACK_EQUIPMENT_MAP;
-
         // Fetch the live equipment register from the worker. If it fails for any
         // reason we just keep using the fallback map so the form is never broken.
         const WORKER_URL = "https://damage-report-api.matthew-rowe1982.workers.dev";
@@ -440,34 +401,29 @@
             .catch(err => {
                 console.warn("Could not load live equipment register, using fallback:", err);
             });
-
-        // Set today's date (LOCAL time, not UTC — avoids off-by-one-day bug overnight)
+        // Set today's date (LOCAL time, not UTC - avoids off-by-one-day bug overnight)
         function setSubmissionDateToToday() {
             document.getElementById("submissionDate").value = new Date().toLocaleDateString("en-CA");
         }
         setSubmissionDateToToday();
         // Refresh the date if the tab was left open overnight and user returns
         window.addEventListener("pageshow", setSubmissionDateToToday);
-
         // Cascading dropdown for Equipment ID (based on Site + Equipment Type)
         function updateEquipmentIdDropdown() {
             const site = document.getElementById("site").value;
             const equipmentType = document.getElementById("equipmentType").value;
             const equipmentIdSelect = document.getElementById("equipmentId");
             const equipmentIdInfo = equipmentIdSelect.parentElement.querySelector(".info-text");
-
             // Reset to default state
             equipmentIdSelect.innerHTML = '<option value="">-- Select Equipment ID --</option>';
             equipmentIdSelect.disabled = false;
             equipmentIdSelect.required = true;
             if (equipmentIdInfo) equipmentIdInfo.textContent = "Filtered based on Equipment Type selection";
-
             if (site && equipmentType && equipmentMap[site] && equipmentMap[site][equipmentType]) {
                 const equipmentIds = equipmentMap[site][equipmentType];
-
                 if (equipmentIds.length === 0) {
                     // Equipment type with no individual IDs (e.g. Airlock Doors, Wrappers)
-                    // — auto-fill N/A and disable the field so user can submit
+                    // - auto-fill N/A and disable the field so user can submit
                     equipmentIdSelect.innerHTML = '<option value="N/A" selected>N/A - Not Applicable</option>';
                     equipmentIdSelect.disabled = true;
                     equipmentIdSelect.required = false;
@@ -484,13 +440,11 @@
                 }
             }
         }
-
         // Update Equipment ID when either Site or Equipment Type changes
         document.getElementById("site").addEventListener("change", updateEquipmentIdDropdown);
         document.getElementById("site").addEventListener("input", updateEquipmentIdDropdown);
         document.getElementById("equipmentType").addEventListener("change", updateEquipmentIdDropdown);
         document.getElementById("equipmentType").addEventListener("input", updateEquipmentIdDropdown);
-
         // Camera + upload functionality
         const cameraButton = document.getElementById("cameraButton");
         const uploadButton = document.getElementById("uploadButton");
@@ -499,12 +453,10 @@
         const photoPreview = document.getElementById("photoPreview");
         const photoImage = document.getElementById("photoImage");
         const removePhotoBtn = document.getElementById("removePhoto");
-
         // Shared handler for whichever input fires a "change"
         function handlePhotoSelected(e) {
             const file = e.target.files[0];
             if (!file) return;
-
             // Reject anything that isn't actually an image (iOS lets users pick ANY file,
             // regardless of the accept attribute)
             const isImage = file.type && file.type.startsWith("image/");
@@ -514,7 +466,6 @@
                 e.target.value = "";
                 return;
             }
-
             const reader = new FileReader();
             reader.onload = function(event) {
                 photoImage.src = event.target.result;
@@ -525,22 +476,18 @@
             };
             reader.readAsDataURL(file);
         }
-
         // Upload button -> open file picker (no camera)
         uploadButton.addEventListener("click", function(e) {
             e.preventDefault();
             photoUploadInput.click();
         });
         photoUploadInput.addEventListener("change", handlePhotoSelected);
-
         // Simple click handler for camera button
         cameraButton.addEventListener("click", function(e) {
             e.preventDefault();
             photoInput.click();
         });
-
         photoInput.addEventListener("change", handlePhotoSelected);
-
         removePhotoBtn.addEventListener("click", function(e) {
             e.preventDefault();
             photoInput.value = "";
@@ -548,15 +495,19 @@
             photoPreview.style.display = "none";
             photoImage.src = "";
         });
-
         // Form submission
         document.getElementById("damageForm").addEventListener("submit", function(e) {
             e.preventDefault();
 
+            const submitBtn = document.querySelector(".submit-btn");
+            const cancelBtn = document.getElementById("cancelBtn");
+
+            // Guard against double-submit (button already locked)
+            if (submitBtn.disabled) return;
+
             // Only send photo if user actually selected one (photoImage.src defaults
             // to the page URL when empty, so check for a proper data URI)
             const hasPhoto = photoImage.src && photoImage.src.startsWith("data:image");
-
             const formData = {
                 name: document.getElementById("name").value,
                 site: document.getElementById("site").value,
@@ -566,16 +517,18 @@
                 submissionDate: document.getElementById("submissionDate").value,
                 photoData: hasPhoto ? photoImage.src : null
             };
-
             // Validate required fields
             if (!formData.name || !formData.site || !formData.equipmentType || !formData.equipmentId || !formData.issueDescription) {
                 showError("Please fill in all required fields.");
                 return;
             }
 
+            // Lock the button immediately so it can't be tapped twice
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting...";
+
             // Submit to Cloudflare Worker
             const workerUrl = "https://damage-report-api.matthew-rowe1982.workers.dev";
-
             fetch(workerUrl, {
                 method: "POST",
                 headers: {
@@ -590,22 +543,26 @@
                 return response.json();
             })
             .then(data => {
-                // Show success message
-                document.getElementById("successMessage").textContent = "Report submitted to SharePoint successfully!";
-                document.getElementById("successMessage").style.display = "block";
+                // Replace the Submit button with a clear "submitted" confirmation
+                submitBtn.textContent = "\u2713 Report Submitted \u2014 Returning to menu...";
+                submitBtn.classList.add("submitted");
+                cancelBtn.style.display = "none";
 
-                // Clear form after 2 seconds
+                // Disable every input so nothing can be changed or re-fired
+                document.querySelectorAll("#damageForm input, #damageForm select, #damageForm textarea, #damageForm button")
+                    .forEach(el => { el.disabled = true; });
+
+                // Return to Reports menu after a short pause
                 setTimeout(() => {
-                    document.getElementById("damageForm").reset();
-                    setSubmissionDateToToday();
-                    photoPreview.style.display = "none";
-                    photoImage.src = "";
-                    document.getElementById("successMessage").style.display = "none";
-                }, 2000);
+                    window.location.href = "../";
+                }, 1800);
             })
             .catch(error => {
-                showError("Error submitting report: " + error.message + ". Report saved locally (without photo) \u2014 please retry.");
+                // Restore the button so the user can retry
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Submit Report";
 
+                showError("Error submitting report: " + error.message + ". Report saved locally (without photo) \u2014 please retry.");
                 // Store metadata only (NOT the photo, which is huge) to avoid quota errors.
                 // Capped to last 20 pending entries.
                 try {
@@ -620,12 +577,11 @@
                     const trimmed = reports.slice(-20);
                     localStorage.setItem("damageReports", JSON.stringify(trimmed));
                 } catch (storageErr) {
-                    // localStorage full or unavailable \u2014 not critical, ignore
+                    // localStorage full or unavailable - not critical, ignore
                     console.warn("Could not save backup:", storageErr);
                 }
             });
         });
-
         // Cancel button
         document.getElementById("cancelBtn").addEventListener("click", function() {
             document.getElementById("damageForm").reset();
@@ -635,7 +591,6 @@
             document.getElementById("errorMessage").classList.remove("show");
             document.getElementById("successMessage").style.display = "none";
         });
-
         function showError(message) {
             const errorDiv = document.getElementById("errorMessage");
             errorDiv.textContent = message;
