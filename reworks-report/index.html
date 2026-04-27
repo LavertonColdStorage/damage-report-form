@@ -369,7 +369,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Location</label>
+                    <label>Location Found?</label>
                     <div class="unknown-row">
                         <input type="text" id="location" placeholder="e.g., A-12-03">
                         <label class="unknown-toggle" data-for="location">
@@ -383,7 +383,7 @@
                     <div class="unknown-row">
                         <input type="date" id="productionDate">
                         <label class="unknown-toggle" data-for="productionDate">
-                            <input type="checkbox"> Label damaged
+                            <input type="checkbox"> Unknown
                         </label>
                     </div>
                 </div>
@@ -448,6 +448,10 @@
                     <div class="conditional" id="damageLocationWrap">
                         <label for="damageLocation" class="required">Damage Location / Reference</label>
                         <input type="text" id="damageLocation" placeholder="Where / what reference was it scanned into?">
+                    </div>
+                    <div class="conditional" id="notScannedWrap">
+                        <label for="notScannedReason" class="required">Why has it not been scanned into damage?</label>
+                        <textarea id="notScannedReason" placeholder="Explain why the product hasn't yet been scanned into damage..."></textarea>
                     </div>
                 </div>
 
@@ -527,6 +531,7 @@
 
         // Yes/No radio visual + conditional field
         const damageLocationWrap = document.getElementById("damageLocationWrap");
+        const notScannedWrap = document.getElementById("notScannedWrap");
         document.querySelectorAll(".radio-option").forEach(opt => {
             opt.addEventListener("click", () => {
                 document.querySelectorAll(".radio-option").forEach(o => o.classList.remove("active"));
@@ -534,9 +539,12 @@
                 opt.querySelector("input").checked = true;
                 if (opt.dataset.value === "Yes") {
                     damageLocationWrap.classList.add("show");
+                    notScannedWrap.classList.remove("show");
+                    document.getElementById("notScannedReason").value = "";
                 } else {
                     damageLocationWrap.classList.remove("show");
                     document.getElementById("damageLocation").value = "";
+                    notScannedWrap.classList.add("show");
                 }
             });
         });
@@ -637,6 +645,7 @@
                 howDamaged: document.getElementById("howDamaged").value.trim(),
                 scannedIntoDamage: scannedRadio ? scannedRadio.value : "",
                 damageLocation: valOrNull("damageLocation"),
+                notScannedReason: valOrNull("notScannedReason"),
                 labelPhoto: labelPhoto,
                 damagePhoto: damagePhoto,
                 uldPhoto: uldPhoto
@@ -653,6 +662,7 @@
             if (!formData.howDamaged) missing.push("How Was it Damaged");
             if (!formData.scannedIntoDamage) missing.push("Scanned Into Damage (Yes/No)");
             if (formData.scannedIntoDamage === "Yes" && !formData.damageLocation) missing.push("Damage Location / Reference");
+            if (formData.scannedIntoDamage === "No" && !formData.notScannedReason) missing.push("Why not scanned into damage");
             if (!labelPhoto) missing.push("Photo of Carton Label");
             if (!damagePhoto) missing.push("Photo of Damage");
 
@@ -696,6 +706,7 @@
             document.querySelectorAll(".unknown-toggle").forEach(l => l.classList.remove("active"));
             document.querySelectorAll(".radio-option").forEach(o => o.classList.remove("active"));
             damageLocationWrap.classList.remove("show");
+            notScannedWrap.classList.remove("show");
             ["uld", "label", "damage"].forEach(key => {
                 document.getElementById(`${key}Image`).src = "";
                 document.getElementById(`${key}Preview`).style.display = "none";
