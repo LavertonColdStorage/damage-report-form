@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reworks Report - Laverton Cold Storage</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 640px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 36px 20px 28px;
+            text-align: center;
+        }
+        .header img { max-width: 100%; height: auto; }
+        .header h1 { font-size: 28px; margin-bottom: 5px; margin-top: 0; }
+        .header p { font-size: 14px; opacity: 0.9; }
+
+        .content { padding: 26px 28px 32px; }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #1e40af;
+            text-decoration: none;
+            margin-bottom: 18px;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #1e40af;
+            margin: 26px 0 14px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #e0e7ff;
+        }
+
+        .form-group { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        .required::after { content: " *"; color: #e74c3c; }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+        }
+        input:disabled, select:disabled, textarea:disabled {
+            background: #f3f4f6;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+        textarea { resize: vertical; min-height: 90px; }
+
+        .unknown-row { display: flex; gap: 10px; align-items: flex-start; }
+        .unknown-row input { flex: 1; }
+        .unknown-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 12px;
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+        .unknown-toggle input { margin: 0; cursor: pointer; flex: 0; }
+        .unknown-toggle.active {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .info-text { font-size: 12px; color: #7f8c8d; margin-top: 4px; }
+
+        .camera-section {
+            margin: 8px 0 0;
+            padding: 16px;
+            background: #ecf0f1;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .photo-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .camera-button, .upload-button {
+            flex: 1 1 140px;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .camera-button { background: #27ae60; }
+        .camera-button:hover { background: #229954; }
+        .upload-button { background: #3b82f6; }
+        .upload-button:hover { background: #1e40af; }
+        .camera-button:disabled, .upload-button:disabled { background: #95a5a6; cursor: not-allowed; }
+
+        .photo-input-hidden {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .photo-preview { margin-top: 12px; display: none; }
+        .photo-preview img { max-width: 100%; border-radius: 6px; margin-bottom: 8px; }
+        .remove-photo {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .remove-photo:hover { background: #c0392b; }
+
+        .radio-group { display: flex; gap: 10px; }
+        .radio-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px;
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+        .radio-option.active.yes {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #15803d;
+        }
+        .radio-option.active.no {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #991b1b;
+        }
+        .radio-option input { display: none; }
+
+        .conditional { display: none; margin-top: 14px; }
+        .conditional.show { display: block; }
+
+        .button-group { display: flex; gap: 10px; margin-top: 30px; }
+        .submit-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(39,174,96,0.3); }
+        .submit-btn:disabled { cursor: not-allowed; opacity: 0.85; }
+        .submit-btn:disabled:hover { transform: none; box-shadow: none; }
+        .submit-btn.submitted {
+            background: #27ae60;
+            font-size: 18px;
+            padding: 20px;
+            opacity: 1;
+        }
+        .cancel-btn {
+            flex: 1;
+            background: #95a5a6;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .cancel-btn:hover { background: #7f8c8d; }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+        .error-message.show { display: block; }
+
+        @media (max-width: 600px) {
+            .content { padding: 20px; }
+            .button-group { flex-direction: column; }
+            .unknown-row { flex-direction: column; }
+            .unknown-row .unknown-toggle { align-self: stretch; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../Chilled-LavertonCS-1.png" alt="Laverton Cold Storage" style="max-width: 280px; margin-bottom: 20px;">
+            <h1>Reworks Report</h1>
+            <p>Damaged Product &amp; Carton Incident Form</p>
+        </div>
+
+        <div class="content">
+            <a href="../" class="back-link">&larr; Back to all reports</a>
+            <div class="error-message" id="errorMessage"></div>
+
+            <form id="reworksForm">
+
+                <!-- Section 1: Report Info -->
+                <div class="section-title">1. Report Info</div>
+
+                <div class="form-group">
+                    <label for="site" class="required">Site</label>
+                    <select id="site" required>
+                        <option value="">-- Select Site --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reportDate" class="required">Date</label>
+                    <input type="date" id="reportDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="staffName" class="required">Staff Name</label>
+                    <input type="text" id="staffName" placeholder="e.g., Matt Rowe" required>
+                    <div class="info-text">Person reporting the damage</div>
+                </div>
+
+                <!-- Section 2: Client & Order -->
+                <div class="section-title">2. Client &amp; Order</div>
+
+                <div class="form-group">
+                    <label for="client" class="required">Client</label>
+                    <select id="client" required>
+                        <option value="">-- Select Client --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Order Number (Inward)</label>
+                    <div class="unknown-row">
+                        <input type="text" id="orderNumber" placeholder="Order #">
+                        <label class="unknown-toggle" data-for="orderNumber">
+                            <input type="checkbox"> Unknown
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>MTC</label>
+                    <div class="unknown-row">
+                        <input type="text" id="mtc" placeholder="MTC number">
+                        <label class="unknown-toggle" data-for="mtc">
+                            <input type="checkbox"> Unknown
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ULD</label>
+                    <div class="unknown-row">
+                        <input type="text" id="uld" placeholder="ULD number">
+                        <label class="unknown-toggle" data-for="uld">
+                            <input type="checkbox"> Unknown
+                        </label>
+                    </div>
+                    <div class="camera-section" style="margin-top: 10px;">
+                        <div class="photo-buttons">
+                            <button type="button" class="camera-button" id="uldCamBtn">&#128247; Photo of ULD</button>
+                            <button type="button" class="upload-button" id="uldUpBtn">&#128193; Upload</button>
+                        </div>
+                        <input type="file" class="photo-input-hidden" id="uldCamInput" accept="image/*" capture="environment">
+                        <input type="file" class="photo-input-hidden" id="uldUpInput" accept="image/*">
+                        <div class="photo-preview" id="uldPreview">
+                            <img id="uldImage" src="" alt="ULD photo">
+                            <button type="button" class="remove-photo" data-target="uld">Remove</button>
+                        </div>
+                        <div class="info-text" style="margin-top: 8px;">Optional &mdash; snap the ULD label if the number is unreadable</div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Product -->
+                <div class="section-title">3. Product</div>
+
+                <div class="form-group">
+                    <label>Product Code</label>
+                    <div class="unknown-row">
+                        <input type="text" id="productCode" placeholder="Product code">
+                        <label class="unknown-toggle" data-for="productCode">
+                            <input type="checkbox"> Unknown &ndash; damaged/no label
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="barcode5">Last 5 Digits of Barcode</label>
+                    <input type="text" id="barcode5" maxlength="5" placeholder="e.g., 48293">
+                    <div class="info-text">Only needed if the barcode is unscannable</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity" class="required">Quantity</label>
+                    <input type="number" id="quantity" min="1" placeholder="e.g., 24" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Location</label>
+                    <div class="unknown-row">
+                        <input type="text" id="location" placeholder="e.g., A-12-03">
+                        <label class="unknown-toggle" data-for="location">
+                            <input type="checkbox"> Unknown
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Production / Packed Date</label>
+                    <div class="unknown-row">
+                        <input type="date" id="productionDate">
+                        <label class="unknown-toggle" data-for="productionDate">
+                            <input type="checkbox"> Label damaged
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Section 4: Damage Details -->
+                <div class="section-title">4. Damage Details</div>
+
+                <div class="form-group">
+                    <label class="required">Photo of Carton Label (or no label)</label>
+                    <div class="camera-section">
+                        <div class="photo-buttons">
+                            <button type="button" class="camera-button" id="labelCamBtn">&#128247; Take Photo</button>
+                            <button type="button" class="upload-button" id="labelUpBtn">&#128193; Upload Photo</button>
+                        </div>
+                        <input type="file" class="photo-input-hidden" id="labelCamInput" accept="image/*" capture="environment">
+                        <input type="file" class="photo-input-hidden" id="labelUpInput" accept="image/*">
+                        <div class="photo-preview" id="labelPreview">
+                            <img id="labelImage" src="" alt="Carton label photo">
+                            <button type="button" class="remove-photo" data-target="label">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="reason" class="required">Reason for Damage</label>
+                    <select id="reason" required>
+                        <option value="">-- Select Reason --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="howDamaged" class="required">How Was it Damaged?</label>
+                    <textarea id="howDamaged" placeholder="Describe how and where the damage occurred..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Photo of Damage</label>
+                    <div class="camera-section">
+                        <div class="photo-buttons">
+                            <button type="button" class="camera-button" id="damageCamBtn">&#128247; Take Photo</button>
+                            <button type="button" class="upload-button" id="damageUpBtn">&#128193; Upload Photo</button>
+                        </div>
+                        <input type="file" class="photo-input-hidden" id="damageCamInput" accept="image/*" capture="environment">
+                        <input type="file" class="photo-input-hidden" id="damageUpInput" accept="image/*">
+                        <div class="photo-preview" id="damagePreview">
+                            <img id="damageImage" src="" alt="Damage photo">
+                            <button type="button" class="remove-photo" data-target="damage">Remove</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="required">Has the Product Been Scanned Into Damage?</label>
+                    <div class="radio-group">
+                        <label class="radio-option yes" data-value="Yes">
+                            <input type="radio" name="scannedIntoDamage" value="Yes"> &#10003; Yes
+                        </label>
+                        <label class="radio-option no" data-value="No">
+                            <input type="radio" name="scannedIntoDamage" value="No"> &#10007; No
+                        </label>
+                    </div>
+                    <div class="conditional" id="damageLocationWrap">
+                        <label for="damageLocation" class="required">Damage Location / Reference</label>
+                        <input type="text" id="damageLocation" placeholder="Where / what reference was it scanned into?">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="submit-btn">Submit Report</button>
+                    <button type="button" class="cancel-btn" id="cancelBtn">Clear</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const WORKER_URL = "https://damage-report-api.matthew-rowe1982.workers.dev";
+
+        // Fallback master data so the form is never broken if the worker is unreachable
+        const FALLBACK_MASTER = {
+            Site: ["Leakes Rd", "Foundation Rd"],
+            Client: ["ABL","CENT","COLT","DCS","FREW","FREWCCS","GF","GREEN","HAZEL","JBS","JUN","Kilcoy","LA","LCS","MCH","MID","MIDAGED","MIDB","MIDC","MIDCCS","MIDCOM","MISC","NAMAG","NORF","Oak","OAKC","TBM","TFI","TURI","UDC","VAN","WAG","WAGCCS","WOOD"],
+            Reason: ["Exposed product / liner","Damaged carton","Damaged label / no label","Blood","Unscannable"]
+        };
+
+        function populateSelect(selectEl, values, placeholder) {
+            selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+            values.forEach(v => {
+                const opt = document.createElement("option");
+                opt.value = v;
+                opt.textContent = v;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function applyMasterData(data) {
+            populateSelect(document.getElementById("site"), data.Site || [], "-- Select Site --");
+            populateSelect(document.getElementById("client"), data.Client || [], "-- Select Client --");
+            populateSelect(document.getElementById("reason"), data.Reason || [], "-- Select Reason --");
+        }
+
+        // Start with fallback so dropdowns are immediately usable
+        applyMasterData(FALLBACK_MASTER);
+
+        // Then fetch live master data from worker and overwrite if successful
+        fetch(`${WORKER_URL}/master-data`, { method: "GET" })
+            .then(r => { if (!r.ok) throw new Error("Status " + r.status); return r.json(); })
+            .then(live => {
+                const merged = {
+                    Site: (live.Site && live.Site.length) ? live.Site : FALLBACK_MASTER.Site,
+                    Client: (live.Client && live.Client.length) ? live.Client : FALLBACK_MASTER.Client,
+                    Reason: (live.Reason && live.Reason.length) ? live.Reason : FALLBACK_MASTER.Reason
+                };
+                applyMasterData(merged);
+            })
+            .catch(err => console.warn("Could not load live master data, using fallback:", err));
+
+        // Default date to today (local time)
+        function setDateToToday() {
+            document.getElementById("reportDate").value = new Date().toLocaleDateString("en-CA");
+        }
+        setDateToToday();
+        window.addEventListener("pageshow", setDateToToday);
+
+        // Unknown toggle behaviour
+        document.querySelectorAll(".unknown-toggle").forEach(label => {
+            const fieldId = label.dataset.for;
+            const field = document.getElementById(fieldId);
+            const cb = label.querySelector("input");
+            cb.addEventListener("change", () => {
+                if (cb.checked) {
+                    field.disabled = true;
+                    field.value = "";
+                    label.classList.add("active");
+                } else {
+                    field.disabled = false;
+                    label.classList.remove("active");
+                }
+            });
+        });
+
+        // Yes/No radio visual + conditional field
+        const damageLocationWrap = document.getElementById("damageLocationWrap");
+        document.querySelectorAll(".radio-option").forEach(opt => {
+            opt.addEventListener("click", () => {
+                document.querySelectorAll(".radio-option").forEach(o => o.classList.remove("active"));
+                opt.classList.add("active");
+                opt.querySelector("input").checked = true;
+                if (opt.dataset.value === "Yes") {
+                    damageLocationWrap.classList.add("show");
+                } else {
+                    damageLocationWrap.classList.remove("show");
+                    document.getElementById("damageLocation").value = "";
+                }
+            });
+        });
+
+        // ---------- Photo handling ----------
+        // Three photo sets: ULD, label, damage. Each has a camera input + upload input
+        // and a preview area. Wire all three with one helper.
+
+        function setupPhotoSet(key) {
+            const camBtn = document.getElementById(`${key}CamBtn`);
+            const upBtn = document.getElementById(`${key}UpBtn`);
+            const camInput = document.getElementById(`${key}CamInput`);
+            const upInput = document.getElementById(`${key}UpInput`);
+            const preview = document.getElementById(`${key}Preview`);
+            const image = document.getElementById(`${key}Image`);
+            const removeBtn = preview.querySelector(".remove-photo");
+
+            function handleFile(file) {
+                if (!file) return;
+                const isImage = (file.type && file.type.startsWith("image/"))
+                    || /\.(jpe?g|png|gif|heic|heif|webp|bmp)$/i.test(file.name || "");
+                if (!isImage) {
+                    showError("Only photo files are allowed.");
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = e => {
+                    image.src = e.target.result;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+
+            camBtn.addEventListener("click", e => { e.preventDefault(); camInput.click(); });
+            upBtn.addEventListener("click", e => { e.preventDefault(); upInput.click(); });
+            camInput.addEventListener("change", e => handleFile(e.target.files[0]));
+            upInput.addEventListener("change", e => handleFile(e.target.files[0]));
+            removeBtn.addEventListener("click", e => {
+                e.preventDefault();
+                camInput.value = "";
+                upInput.value = "";
+                image.src = "";
+                preview.style.display = "none";
+            });
+        }
+
+        setupPhotoSet("uld");
+        setupPhotoSet("label");
+        setupPhotoSet("damage");
+
+        // ---------- Form submission ----------
+        const submitBtn = document.querySelector(".submit-btn");
+        const cancelBtn = document.getElementById("cancelBtn");
+
+        function getPhotoData(key) {
+            const img = document.getElementById(`${key}Image`).src;
+            return img && img.startsWith("data:image") ? img : null;
+        }
+
+        function valOrNull(id) {
+            const el = document.getElementById(id);
+            if (el.disabled) return null;
+            const v = el.value.trim();
+            return v === "" ? null : v;
+        }
+
+        function showError(msg) {
+            const e = document.getElementById("errorMessage");
+            e.textContent = msg;
+            e.classList.add("show");
+            setTimeout(() => e.classList.remove("show"), 5000);
+        }
+
+        document.getElementById("reworksForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            if (submitBtn.disabled) return;
+
+            // Collect data
+            const scannedRadio = document.querySelector("input[name=scannedIntoDamage]:checked");
+            const labelPhoto = getPhotoData("label");
+            const damagePhoto = getPhotoData("damage");
+            const uldPhoto = getPhotoData("uld");
+
+            const formData = {
+                reportDate: document.getElementById("reportDate").value,
+                site: document.getElementById("site").value,
+                staffName: document.getElementById("staffName").value.trim(),
+                client: document.getElementById("client").value,
+                orderNumber: valOrNull("orderNumber"),
+                mtc: valOrNull("mtc"),
+                uld: valOrNull("uld"),
+                productCode: valOrNull("productCode"),
+                barcodeLast5: valOrNull("barcode5"),
+                quantity: document.getElementById("quantity").value,
+                location: valOrNull("location"),
+                productionDate: valOrNull("productionDate"),
+                reason: document.getElementById("reason").value,
+                howDamaged: document.getElementById("howDamaged").value.trim(),
+                scannedIntoDamage: scannedRadio ? scannedRadio.value : "",
+                damageLocation: valOrNull("damageLocation"),
+                labelPhoto: labelPhoto,
+                damagePhoto: damagePhoto,
+                uldPhoto: uldPhoto
+            };
+
+            // Validate required fields
+            const missing = [];
+            if (!formData.site) missing.push("Site");
+            if (!formData.reportDate) missing.push("Date");
+            if (!formData.staffName) missing.push("Staff Name");
+            if (!formData.client) missing.push("Client");
+            if (!formData.quantity) missing.push("Quantity");
+            if (!formData.reason) missing.push("Reason for Damage");
+            if (!formData.howDamaged) missing.push("How Was it Damaged");
+            if (!formData.scannedIntoDamage) missing.push("Scanned Into Damage (Yes/No)");
+            if (formData.scannedIntoDamage === "Yes" && !formData.damageLocation) missing.push("Damage Location / Reference");
+            if (!labelPhoto) missing.push("Photo of Carton Label");
+            if (!damagePhoto) missing.push("Photo of Damage");
+
+            if (missing.length) {
+                showError("Please complete: " + missing.join(", "));
+                return;
+            }
+
+            // Lock the button
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting...";
+
+            fetch(`${WORKER_URL}/reworks`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+            .then(r => {
+                if (!r.ok) throw new Error("Server error: " + r.statusText);
+                return r.json();
+            })
+            .then(data => {
+                submitBtn.textContent = "\u2713 Report Submitted \u2014 Returning to menu...";
+                submitBtn.classList.add("submitted");
+                cancelBtn.style.display = "none";
+                document.querySelectorAll("#reworksForm input, #reworksForm select, #reworksForm textarea, #reworksForm button")
+                    .forEach(el => el.disabled = true);
+                setTimeout(() => { window.location.href = "../"; }, 1800);
+            })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Submit Report";
+                showError("Error submitting report: " + err.message + ". Please retry.");
+            });
+        });
+
+        // Clear button
+        cancelBtn.addEventListener("click", () => {
+            document.getElementById("reworksForm").reset();
+            setDateToToday();
+            document.querySelectorAll(".unknown-toggle").forEach(l => l.classList.remove("active"));
+            document.querySelectorAll(".radio-option").forEach(o => o.classList.remove("active"));
+            damageLocationWrap.classList.remove("show");
+            ["uld", "label", "damage"].forEach(key => {
+                document.getElementById(`${key}Image`).src = "";
+                document.getElementById(`${key}Preview`).style.display = "none";
+            });
+            document.querySelectorAll("#reworksForm input:disabled, #reworksForm select:disabled, #reworksForm textarea:disabled")
+                .forEach(el => el.disabled = false);
+        });
+    </script>
+</body>
+</html>
