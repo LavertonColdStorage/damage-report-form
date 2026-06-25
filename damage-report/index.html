@@ -292,15 +292,7 @@
                 <div class="form-group">
                     <label for="equipmentType" class="required">Equipment Type</label>
                     <select id="equipmentType" name="equipmentType" required>
-                        <option value="">-- Select Equipment Type --</option>
-                        <option value="Reach">Reach</option>
-                        <option value="Forklift">Forklift</option>
-                        <option value="Tugger">Tugger</option>
-                        <option value="Electric Pallet Jack">Electric Pallet Jack</option>
-                        <option value="Robot">Robot</option>
-                        <option value="Airlock Doors">Airlock Doors</option>
-                        <option value="Wrappers">Wrappers</option>
-                        <option value="Other">Other</option>
+                        <option value="">-- Select Site First --</option>
                     </select>
                 </div>
                 <!-- Equipment ID -->
@@ -393,9 +385,9 @@
                 }
                 equipmentMap = merged;
                 // If the user already selected site+type before fetch completed, refresh
-                // the Equipment ID dropdown with the new data.
-                if (typeof updateEquipmentIdDropdown === "function") {
-                    updateEquipmentIdDropdown();
+                // both dropdowns with the new data.
+                if (typeof populateEquipmentTypes === "function") {
+                    populateEquipmentTypes();
                 }
             })
             .catch(err => {
@@ -408,6 +400,39 @@
         setSubmissionDateToToday();
         // Refresh the date if the tab was left open overnight and user returns
         window.addEventListener("pageshow", setSubmissionDateToToday);
+        // Populate Equipment Type dropdown based on the selected Site.
+        // Types come from whatever is in the SharePoint Equipment Register
+        // for that site. Add a new equipment type in SharePoint and it shows
+        // up here automatically — no code change needed.
+        function populateEquipmentTypes() {
+            const siteValue = document.getElementById("site").value;
+            const typeSelect = document.getElementById("equipmentType");
+            const currentValue = typeSelect.value;
+
+            if (!siteValue) {
+                typeSelect.innerHTML = '<option value="">-- Select Site First --</option>';
+            } else if (equipmentMap[siteValue]) {
+                const types = Object.keys(equipmentMap[siteValue]).sort((a, b) =>
+                    a.localeCompare(b, undefined, { sensitivity: "base" })
+                );
+                typeSelect.innerHTML = '<option value="">-- Select Equipment Type --</option>';
+                types.forEach(type => {
+                    const opt = document.createElement("option");
+                    opt.value = type;
+                    opt.textContent = type;
+                    typeSelect.appendChild(opt);
+                });
+                // Keep previous selection if it still exists for this site
+                if (currentValue) {
+                    const stillValid = Array.from(typeSelect.options).some(o => o.value === currentValue);
+                    if (stillValid) typeSelect.value = currentValue;
+                }
+            } else {
+                typeSelect.innerHTML = '<option value="">-- No equipment registered for this site --</option>';
+            }
+            updateEquipmentIdDropdown();
+        }
+
         // Cascading dropdown for Equipment ID (based on Site + Equipment Type)
         function updateEquipmentIdDropdown() {
             const site = document.getElementById("site").value;
@@ -440,9 +465,10 @@
                 }
             }
         }
-        // Update Equipment ID when either Site or Equipment Type changes
-        document.getElementById("site").addEventListener("change", updateEquipmentIdDropdown);
-        document.getElementById("site").addEventListener("input", updateEquipmentIdDropdown);
+        // Site changes refresh the Equipment Type dropdown (which then refreshes IDs)
+        document.getElementById("site").addEventListener("change", populateEquipmentTypes);
+        document.getElementById("site").addEventListener("input", populateEquipmentTypes);
+        // Equipment Type changes refresh the Equipment ID dropdown
         document.getElementById("equipmentType").addEventListener("change", updateEquipmentIdDropdown);
         document.getElementById("equipmentType").addEventListener("input", updateEquipmentIdDropdown);
         // Camera + upload functionality
