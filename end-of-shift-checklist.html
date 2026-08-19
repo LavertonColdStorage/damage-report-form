@@ -680,9 +680,74 @@
             }
         }
 
-        document.getElementById('checklistForm').addEventListener('submit', function(e) {
+        document.getElementById('checklistForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert('✓ Checklist submitted successfully!\n\nYour submission has been recorded. Thank you!');
+            console.log('=== FORM SUBMISSION STARTED ===');
+
+            // Show loading state
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                // Collect form data
+                console.log('Step 1: Collecting form data...');
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData);
+                console.log('Form data collected:', data);
+                console.log('Site:', data.site);
+                console.log('Shift:', data.shift);
+
+                // Validate required fields
+                if (!data.site || data.site === '') {
+                    throw new Error('Site is required');
+                }
+                if (!data.shift || data.shift === '') {
+                    throw new Error('Shift is required');
+                }
+                console.log('✓ Validation passed');
+
+                // Send to Cloudflare Worker
+                console.log('Step 2: Sending to Cloudflare Worker...');
+                const workerUrl = 'https://damage-report-api.matthew-rowe1982.workers.dev/end-of-shift';
+                console.log('Worker URL:', workerUrl);
+                console.log('Request payload:', JSON.stringify(data));
+
+                const response = await fetch(workerUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                console.log('Step 3: Received response');
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                const result = await response.json();
+                console.log('Response body:', result);
+
+                if (response.ok) {
+                    console.log('✓ SUCCESS: Checklist submitted!');
+                    alert('✓ Checklist submitted successfully!\n\n' + result.message);
+                    // Reset form after successful submission
+                    this.reset();
+                    document.getElementById('date').value = new Date().toISOString().split('T')[0];
+                } else {
+                    console.error('✗ FAILED: Server returned error');
+                    alert('❌ Submission failed:\n' + (result.error || 'Unknown error') + '\n\nCheck browser console for details (F12)');
+                }
+            } catch (error) {
+                console.error('✗ EXCEPTION:', error);
+                console.error('Error stack:', error.stack);
+                alert('❌ Error submitting checklist:\n' + error.message + '\n\nCheck browser console for details (F12)');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                console.log('=== FORM SUBMISSION ENDED ===\n');
+            }
         });
     </script>
 </body>
