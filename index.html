@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 12px;
@@ -31,65 +31,63 @@
         .header {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             color: white;
-            padding: 32px 24px;
+            padding: 40px 24px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 26px;
+            font-size: 32px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             letter-spacing: -0.5px;
         }
 
         .header p {
-            font-size: 15px;
+            font-size: 16px;
             opacity: 0.92;
         }
 
         .content {
-            padding: 28px 24px;
+            padding: 32px 24px;
         }
 
         .intro {
             text-align: center;
             color: #4b5563;
             font-size: 15px;
-            margin-bottom: 24px;
+            margin-bottom: 32px;
+            font-weight: 500;
         }
 
         .tiles {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .tile {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             background: #f9fafb;
             border: 2px solid #e5e7eb;
             border-radius: 10px;
-            padding: 24px 20px;
+            overflow: hidden;
             text-decoration: none;
             color: inherit;
-            transition: all 0.15s ease;
-            min-height: 170px;
+            transition: all 0.2s ease;
             position: relative;
         }
 
         .tile.active {
             background: white;
             border-color: #3b82f6;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
         }
 
-        .tile.active:hover,
-        .tile.active:focus {
-            background: #eff6ff;
-            border-color: #1e40af;
+        .tile.active:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(30, 64, 175, 0.15);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+            border-color: #1e40af;
         }
 
         .tile.coming-soon {
@@ -99,34 +97,46 @@
             cursor: not-allowed;
         }
 
+        .tile-header {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .tile.coming-soon .tile-header {
+            border-bottom-color: #d1d5db;
+        }
+
         .tile-icon {
-            font-size: 42px;
+            font-size: 48px;
             line-height: 1;
-            margin-bottom: 12px;
+            flex-shrink: 0;
         }
 
         .tile-title {
-        .tile-desc {
-            font-size: 13px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 2px;
+        }
+
+        .tile.coming-soon .tile-title {
             color: #6b7280;
-            line-height: 1.4;
         }
 
         .badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
+            background: #dcfce7;
+            color: #15803d;
             font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 4px 8px;
-            border-radius: 10px;
-        }
-
-        .badge-live {
-            background: #dcfce7;
-            color: #15803d;
+            border-radius: 6px;
+            flex-shrink: 0;
         }
 
         .badge-soon {
@@ -134,30 +144,64 @@
             color: #92400e;
         }
 
+        .tile-body {
+            padding: 16px 20px;
+            flex: 1;
+        }
+
+        .tile-desc {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .tile.coming-soon .tile-desc {
+            color: #9ca3af;
+        }
+
+        .tile-footer {
+            padding: 12px 20px;
+            border-top: 1px solid #e5e7eb;
+            background: #fafbfc;
+        }
+
+        .tile.coming-soon .tile-footer {
+            border-top-color: #d1d5db;
+            background: #f3f4f6;
+        }
+
         .tile-cta {
-            margin-top: 14px;
             font-size: 13px;
             font-weight: 600;
             color: #1e40af;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .tile.coming-soon .tile-cta {
             color: #9ca3af;
         }
 
+        .tile.active:hover .tile-cta {
+            text-decoration: underline;
+        }
+
         .footer {
             text-align: center;
-            padding: 16px 24px 24px;
+            padding: 20px 24px;
             font-size: 12px;
             color: #9ca3af;
             border-top: 1px solid #f3f4f6;
         }
 
-        @media (max-width: 500px) {
-            .header h1 { font-size: 22px; }
-            .tile { min-height: 150px; padding: 20px 16px; }
-            .tile-icon { font-size: 36px; }
-            .tile-title { font-size: 16px; }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 26px; }
+            .header p { font-size: 14px; }
+            .tiles { grid-template-columns: 1fr; }
+            .tile-icon { font-size: 40px; }
+            .tile-title { font-size: 18px; }
+            .intro { font-size: 14px; margin-bottom: 24px; }
         }
     </style>
 </head>
@@ -173,48 +217,72 @@
 
             <div class="tiles">
 
-                <!-- Damage Report - ACTIVE -->
+                <!-- Damage Report -->
                 <a href="damage-report/" class="tile active">
-                    <span class="badge badge-live">Live</span>
-                    <div>
-                        <div class="tile-icon">&#128680;</div>
-                        <div class="tile-title">Damage Report</div>
-                        <div class="tile-desc">Report damaged equipment (reach, forklift, doors, etc.)</div>
+                    <div class="tile-header">
+                        <div>
+                            <div class="tile-icon">&#128680;</div>
+                        </div>
+                        <span class="badge">Live</span>
                     </div>
-                    <div class="tile-cta">Start report &rarr;</div>
+                    <div class="tile-body">
+                        <h3 class="tile-title">Damage Report</h3>
+                        <p class="tile-desc">Report damaged equipment (reach, forklift, doors, etc.)</p>
+                    </div>
+                    <div class="tile-footer">
+                        <a href="damage-report/" class="tile-cta">Start report →</a>
+                    </div>
                 </a>
 
-                <!-- End of Shift Checklist - LIVE -->
+                <!-- End of Shift Checklist -->
                 <a href="end-of-shift-checklist/" class="tile active">
-                    <span class="badge badge-live">LIVE</span>
-                    <div>
-                        <div class="tile-icon">&#9989;</div>
-                        <div class="tile-title">End of Shift Checklist</div>
-                        <div class="tile-desc">Equipment condition, fuel/charge levels, handover notes</div>
+                    <div class="tile-header">
+                        <div>
+                            <div class="tile-icon">&#9989;</div>
+                        </div>
+                        <span class="badge">Live</span>
                     </div>
-                    <div class="tile-cta">Start report &rarr;</div>
+                    <div class="tile-body">
+                        <h3 class="tile-title">End of Shift Checklist</h3>
+                        <p class="tile-desc">Equipment condition, fuel/charge levels, handover notes</p>
+                    </div>
+                    <div class="tile-footer">
+                        <a href="end-of-shift-checklist/" class="tile-cta">Start report →</a>
+                    </div>
                 </a>
 
-                <!-- Container Load Photos - COMING SOON -->
+                <!-- Container Load Photos -->
                 <div class="tile coming-soon" role="button" aria-disabled="true">
-                    <span class="badge badge-soon">Coming Soon</span>
-                    <div>
-                        <div class="tile-icon">&#128225;</div>
-                        <div class="tile-title">Container Load Photos</div>
-                        <div class="tile-desc">Photos &amp; details of containers being loaded</div>
+                    <div class="tile-header">
+                        <div>
+                            <div class="tile-icon">&#128225;</div>
+                        </div>
+                        <span class="badge badge-soon">Coming Soon</span>
                     </div>
-                    <div class="tile-cta">Available soon</div>
+                    <div class="tile-body">
+                        <h3 class="tile-title">Container Load Photos</h3>
+                        <p class="tile-desc">Photos &amp; details of containers being loaded</p>
+                    </div>
+                    <div class="tile-footer">
+                        <span class="tile-cta">Available soon</span>
+                    </div>
                 </div>
 
-                <!-- Reworks Report - ACTIVE -->
+                <!-- Reworks Report -->
                 <a href="reworks-report/" class="tile active">
-                    <span class="badge badge-live">Live</span>
-                    <div>
-                        <div class="tile-icon">&#128736;</div>
-                        <div class="tile-title">Reworks Report</div>
-                        <div class="tile-desc">Log damaged product, cartons or labels</div>
+                    <div class="tile-header">
+                        <div>
+                            <div class="tile-icon">&#128736;</div>
+                        </div>
+                        <span class="badge">Live</span>
                     </div>
-                    <div class="tile-cta">Start report &rarr;</div>
+                    <div class="tile-body">
+                        <h3 class="tile-title">Reworks Report</h3>
+                        <p class="tile-desc">Log damaged product, cartons or labels</p>
+                    </div>
+                    <div class="tile-footer">
+                        <a href="reworks-report/" class="tile-cta">Start report →</a>
+                    </div>
                 </a>
 
             </div>
@@ -225,13 +293,4 @@
         </div>
     </div>
 </body>
-</html>            font-size: 18px;
-            font-weight: 600;
-        .tile.coming-soon .tile-title {
-            color: #6b7280;
-        }
-
-            margin-bottom: 6px;
-        }
-
-
+</html>
