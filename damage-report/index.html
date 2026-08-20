@@ -562,12 +562,19 @@
                 },
                 body: JSON.stringify(formData)
             })
-            .then(response => {
+                        .then(async response => {
+                const raw = await response.text();
+                let payload = null;
+                try { payload = raw ? JSON.parse(raw) : null; } catch (e) { /* not JSON */ }
                 if (!response.ok) {
-                    throw new Error(`Server error: ${response.statusText}`);
+                    const reason = (payload && (payload.error || payload.message))
+                        || (raw ? raw.slice(0, 300) : "")
+                        || ("HTTP " + response.status);
+                    throw new Error(reason);
                 }
-                return response.json();
+                return payload || {};
             })
+
             .then(data => {
                 // Replace the Submit button with a clear "submitted" confirmation
                 submitBtn.textContent = "\u2713 Report Submitted \u2014 Returning to menu...";
