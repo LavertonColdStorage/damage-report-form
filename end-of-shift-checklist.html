@@ -28,10 +28,15 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #2c5f7f 0%, #1a3a52 100%);
-            padding: 40px 30px;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            padding: 40px 20px;
             text-align: center;
             color: white;
+        }
+
+        .header img {
+            max-width: 100%;
+            height: auto;
         }
 
         .logo {
@@ -47,22 +52,11 @@
             opacity: 0.8;
         }
 
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            margin-bottom: 10px;
-            opacity: 0.9;
-        }
-
-        .logo-text {
-            font-size: 14px;
-            opacity: 0.7;
-        }
-
-        .header h1 {
-            font-size: 36px;
+                .header h1 {
+            font-size: 28px;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
+            margin-top: 0;
         }
 
         .header p {
@@ -325,7 +319,7 @@
             }
 
             .header h1 {
-                font-size: 28px;
+                font-size: 22px;
             }
 
             .photo-buttons {
@@ -337,20 +331,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <a href="../" class="logo" title="Back to reports">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" fill="white" opacity="0.8"/>
-                    </svg>
-                </div>
-                <div class="logo-text">Laverton<br>Cold Storage</div>
+            <a href="./" class="logo" title="Back to reports">
+                <img src="Chilled-LavertonCS-1.png" alt="Laverton Cold Storage" style="max-width: 280px; height: auto; margin-bottom: 20px;">
             </a>
             <h1>End of Shift Checklist</h1>
             <p>Equipment condition, fuel/charge levels, handover notes</p>
         </div>
 
         <div class="form-wrapper">
-            <a href="../" class="back-link">← Back to all reports</a>
+            <a href="./" class="back-link">← Back to all reports</a>
 
             <form id="checklistForm">
                 <!-- BASIC INFORMATION -->
@@ -358,7 +347,7 @@
 
                 <div class="form-group">
                     <label for="site">Site <span class="required">*</span></label>
-                    <select id="site" name="site" required onchange="updateVisibility()">
+                    <select id="site" name="site" required onchange="updateVisibility(); loadPreviousShift(this.value);">
                         <option value="">-- Select Site --</option>
                         <option value="Foundation">Foundation</option>
                         <option value="Leakes">Leakes</option>
@@ -389,13 +378,13 @@
                 <!-- PUTAWAYS & PICKS -->
                 <div class="section-header">2. PUTAWAYS & PICKS</div>
 
-                <div class="alert alert-info">ℹ️ Beginning-of-shift numbers are automatically filled from the previous shift. Do not edit these fields.</div>
+                <div class="alert alert-info" id="previousShiftBanner">Pick a site above and the beginning-of-shift numbers will be filled in from the last submitted shift.</div>
 
                 <div class="two-columns">
                     <div class="form-group">
                         <label>Putaways at beginning of shift</label>
                         <span class="previous-count">Auto-filled from last shift</span>
-                        <input type="number" id="putawaysBegin" value="145" readonly>
+                        <input type="number" id="putawaysBegin" name="putawaysBegin" placeholder="Select a site" readonly>
                     </div>
                     <div class="form-group">
                         <label for="putawaysEnd">Putaways at end of shift <span class="required">*</span></label>
@@ -407,7 +396,7 @@
                     <div class="form-group">
                         <label>Picks at beginning of shift</label>
                         <span class="previous-count">Auto-filled from last shift</span>
-                        <input type="number" id="picksBegin" value="287" readonly>
+                        <input type="number" id="picksBegin" name="picksBegin" placeholder="Select a site" readonly>
                     </div>
                     <div class="form-group">
                         <label for="picksEnd">Picks at end of shift <span class="required">*</span></label>
@@ -416,8 +405,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="picksSequential">Are all picks in sequential order? <span class="required">*</span></label>
-                    <select id="picksSequential" name="picksSequential" required>
+                    <label for="picksCalendarOrder">Are all picks handed out in calendar order? <span class="required">*</span></label>
+                    <select id="picksCalendarOrder" name="picksCalendarOrder" required>
                         <option value="">-- Select --</option>
                         <option value="Yes">Yes</option>
                         <option value="No">No</option>
@@ -490,7 +479,7 @@
                         <h3 style="color: #2c5f7f; font-size: 16px; margin-bottom: 15px;">📱 Scanners</h3>
 
                         <div class="form-group">
-                            <label>Previous meal break: 5 units</label>
+                            <label>Previous meal break: <span id="prevScanners">select a site</span></label>
                         </div>
 
                         <div class="form-group">
@@ -519,7 +508,7 @@
                         <h3 style="color: #2c5f7f; font-size: 16px; margin-bottom: 15px;">📡 Radios</h3>
 
                         <div class="form-group">
-                            <label>Previous meal break: 8 units</label>
+                            <label>Previous meal break: <span id="prevRadios">select a site</span></label>
                         </div>
 
                         <div class="form-group">
@@ -548,7 +537,7 @@
                         <h3 style="color: #2c5f7f; font-size: 16px; margin-bottom: 15px;">🖨️ Printers</h3>
 
                         <div class="form-group">
-                            <label>Previous meal break: 3 units</label>
+                            <label>Previous meal break: <span id="prevPrinters">select a site</span></label>
                         </div>
 
                         <div class="form-group">
@@ -630,12 +619,86 @@
         const day = String(today.getDate()).padStart(2, '0');
         document.getElementById('date').value = `${year}-${month}-${day}`;
 
+        // ---------------------------------------------------------------
         // Previous shift data
-        const previousShiftData = {
-            scannersNum: 5,
-            radiosNum: 8,
-            printersNum: 3
+        //
+        // These used to be hard-coded (5 / 8 / 3), so the "why did the count
+        // change?" prompt fired against a constant rather than what the last
+        // shift actually handed over. They're now loaded from the Worker,
+        // which reads the most recent submission for the selected site.
+        // ---------------------------------------------------------------
+        const WORKER_BASE = 'https://damage-report-api.matthew-rowe1982.workers.dev';
+
+        let previousShiftData = {
+            scannersNum: null,
+            radiosNum: null,
+            printersNum: null
         };
+
+        function setPrevLabel(id, value) {
+            document.getElementById(id).textContent =
+                (value === null || value === undefined) ? 'no previous shift on record' : value + ' units';
+        }
+
+        function clearPreviousShift(message) {
+            previousShiftData = { scannersNum: null, radiosNum: null, printersNum: null };
+            document.getElementById('putawaysBegin').value = '';
+            document.getElementById('picksBegin').value = '';
+            ['prevScanners', 'prevRadios', 'prevPrinters'].forEach(id => setPrevLabel(id, null));
+            document.getElementById('previousShiftBanner').textContent = message;
+            updateVisibility();
+        }
+
+        async function loadPreviousShift(site) {
+            const banner = document.getElementById('previousShiftBanner');
+            if (!site) {
+                clearPreviousShift('Pick a site above and the beginning-of-shift numbers will be filled in from the last submitted shift.');
+                return;
+            }
+
+            banner.textContent = 'Looking up the last shift for ' + site + '...';
+
+            try {
+                const res = await fetch(WORKER_BASE + '/end-of-shift/previous?site=' + encodeURIComponent(site));
+                const prev = await res.json();
+
+                if (!res.ok || !prev.found) {
+                    clearPreviousShift('No previous shift on record for ' + site + '. Enter the beginning-of-shift numbers manually.');
+                    document.getElementById('putawaysBegin').removeAttribute('readonly');
+                    document.getElementById('picksBegin').removeAttribute('readonly');
+                    document.getElementById('putawaysBegin').placeholder = 'Enter number';
+                    document.getElementById('picksBegin').placeholder = 'Enter number';
+                    return;
+                }
+
+                document.getElementById('putawaysBegin').setAttribute('readonly', 'readonly');
+                document.getElementById('picksBegin').setAttribute('readonly', 'readonly');
+                document.getElementById('putawaysBegin').value = prev.putawaysEnd === null ? '' : prev.putawaysEnd;
+                document.getElementById('picksBegin').value = prev.picksEnd === null ? '' : prev.picksEnd;
+
+                previousShiftData = {
+                    scannersNum: prev.scannersNum,
+                    radiosNum: prev.radiosNum,
+                    printersNum: prev.printersNum
+                };
+                setPrevLabel('prevScanners', prev.scannersNum);
+                setPrevLabel('prevRadios', prev.radiosNum);
+                setPrevLabel('prevPrinters', prev.printersNum);
+
+                const when = prev.submitted ? new Date(prev.submitted).toLocaleString('en-AU', {
+                    day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true
+                }) : 'unknown time';
+                banner.textContent = 'Carried over from the ' + (prev.shift || 'previous') +
+                    ' shift at ' + prev.site + ', submitted ' + when + '.';
+
+                updateVisibility();
+            } catch (err) {
+                console.warn('Could not load previous shift:', err);
+                clearPreviousShift('Could not reach the server to load the last shift. Enter the beginning-of-shift numbers manually.');
+                document.getElementById('putawaysBegin').removeAttribute('readonly');
+                document.getElementById('picksBegin').removeAttribute('readonly');
+            }
+        }
 
         function updateVisibility() {
             // Show/hide absence names
@@ -651,12 +714,19 @@
             const radiosNum = parseInt(document.getElementById('radiosNum').value);
             const printersNum = parseInt(document.getElementById('printersNum').value);
 
+            // Only ask for an explanation when there IS a baseline to differ from.
+            function differs(entered, baseline) {
+                if (isNaN(entered)) return false;
+                if (baseline === null || baseline === undefined) return false;
+                return entered !== baseline;
+            }
+
             document.getElementById('scannerMissingGroup').classList.toggle('hidden',
-                isNaN(scannersNum) || scannersNum === previousShiftData.scannersNum);
+                !differs(scannersNum, previousShiftData.scannersNum));
             document.getElementById('radioMissingGroup').classList.toggle('hidden',
-                isNaN(radiosNum) || radiosNum === previousShiftData.radiosNum);
+                !differs(radiosNum, previousShiftData.radiosNum));
             document.getElementById('printerMissingGroup').classList.toggle('hidden',
-                isNaN(printersNum) || printersNum === previousShiftData.printersNum);
+                !differs(printersNum, previousShiftData.printersNum));
         }
 
         function updatePhotoPreview(type) {
