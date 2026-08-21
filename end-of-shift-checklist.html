@@ -189,6 +189,38 @@
             border-left: 4px solid #1976d2;
         }
 
+        .validation-summary {
+            display: none;
+            background: #fdecec;
+            border-left: 4px solid #b91c1c;
+            border-radius: 6px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+        }
+        .validation-summary.show { display: block; }
+        .validation-summary h4 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: #b91c1c;
+        }
+        .validation-summary ul { margin: 0; padding-left: 20px; }
+        .validation-summary li {
+            font-size: 14px;
+            color: #7f1d1d;
+            margin-bottom: 4px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .field-invalid,
+        .field-invalid:focus {
+            border-color: #b91c1c !important;
+            box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.12) !important;
+        }
+        .file-upload.field-invalid {
+            border-color: #b91c1c !important;
+            background: #fdecec;
+        }
+
         .alert-warning {
             background: #fff3e0;
             color: #f57c00;
@@ -341,7 +373,7 @@
         <div class="form-wrapper">
             <a href="./" class="back-link">← Back to all reports</a>
 
-            <form id="checklistForm">
+            <form id="checklistForm" novalidate>
                 <!-- BASIC INFORMATION -->
                 <div class="section-header">1. BASIC INFORMATION</div>
 
@@ -468,7 +500,7 @@
 
                 <div id="absentNamesGroup" class="form-group hidden">
                     <label for="absentNames">If Yes - Staff member names <span class="required">*</span></label>
-                    <textarea id="absentNames" name="absentNames" placeholder="Enter names of absent staff members"></textarea>
+                    <textarea id="absentNames" name="absentNames" required placeholder="Enter names of absent staff members"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -488,7 +520,7 @@
 
                 <div id="unsatisfactoryGroup" class="form-group hidden">
                     <label for="unsatisfactory">If No - Who and why <span class="required">*</span></label>
-                    <textarea id="unsatisfactory" name="unsatisfactory" placeholder="Describe performance issues"></textarea>
+                    <textarea id="unsatisfactory" name="unsatisfactory" required placeholder="Describe performance issues"></textarea>
                 </div>
 
                 <!-- HANDOVER & PROBLEMS -->
@@ -540,7 +572,7 @@
 
                         <div id="scannerMissingGroup" class="form-group hidden">
                             <label for="scannerMissing">If count changed - Why? <span class="required">*</span></label>
-                            <textarea id="scannerMissing" name="scannerMissing" placeholder="Explain why the count differs"></textarea>
+                            <textarea id="scannerMissing" name="scannerMissing" required placeholder="Explain why the count differs"></textarea>
                         </div>
                     </div>
 
@@ -569,7 +601,7 @@
 
                         <div id="radioMissingGroup" class="form-group hidden">
                             <label for="radioMissing">If count changed - Why? <span class="required">*</span></label>
-                            <textarea id="radioMissing" name="radioMissing" placeholder="Explain why the count differs"></textarea>
+                            <textarea id="radioMissing" name="radioMissing" required placeholder="Explain why the count differs"></textarea>
                         </div>
                     </div>
 
@@ -598,7 +630,7 @@
 
                         <div id="printerMissingGroup" class="form-group hidden">
                             <label for="printerMissing">If count changed - Why? <span class="required">*</span></label>
-                            <textarea id="printerMissing" name="printerMissing" placeholder="Explain why the count differs"></textarea>
+                            <textarea id="printerMissing" name="printerMissing" required placeholder="Explain why the count differs"></textarea>
                         </div>
                     </div>
                 </div>
@@ -644,6 +676,11 @@
                 </div>
 
                 <!-- SUBMIT -->
+                <div class="validation-summary" id="validationSummary">
+                    <h4>Please complete these before submitting</h4>
+                    <ul id="validationList"></ul>
+                </div>
+
                 <div class="button-group">
                     <button type="submit" class="btn-primary">✓ Submit Checklist</button>
                     <button type="reset" class="btn-cancel">Clear Form</button>
@@ -805,6 +842,19 @@
                 !differs(printersNum, previousShiftData.printersNum));
         }
 
+        // ---------------------------------------------------------------
+        // Photo capture
+        //
+        // This used to read only the FILENAME and print "Photo uploaded",
+        // while the file itself was never read or sent — the inputs had no
+        // name attribute either, so nothing reached the server. Every photo
+        // taken was discarded at the moment staff were told it had uploaded.
+        //
+        // Now the file is read as a data URL and travels with the submission,
+        // and the confirmation only appears once that has actually happened.
+        // ---------------------------------------------------------------
+        const photoData = { scanner: null, radio: null, printer: null };
+
         function updatePhotoPreview(type) {
             const inputMap = {
                 'scanner': 'scannerPhotoInput',
@@ -819,16 +869,140 @@
 
             const input = document.getElementById(inputMap[type]);
             const preview = document.getElementById(previewMap[type]);
+            const file = input.files && input.files[0];
 
-            if (input.files && input.files[0]) {
-                const fileName = input.files[0].name;
-                preview.textContent = '✓ Photo uploaded: ' + fileName;
+            if (!file) {
+                photoData[type] = null;
+                preview.textContent = '';
+                return;
             }
+
+            preview.textContent = 'Reading ' + file.name + '...';
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                photoData[type] = e.target.result;
+                const kb = Math.round(file.size / 1024);
+                preview.textContent = '\u2713 ' + file.name + ' (' + kb + ' KB) ready to send';
+            };
+            reader.onerror = () => {
+                photoData[type] = null;
+                preview.textContent = '\u2717 Could not read ' + file.name + ' - please try again';
+            };
+            reader.readAsDataURL(file);
         }
+
+        // ---------------------------------------------------------------
+        // Validation
+        //
+        // Native browser validation is switched off (novalidate on the form)
+        // for two reasons: it only reports one field at a time, and a required
+        // field inside a hidden section fails invisibly — the form just refuses
+        // to submit with no explanation. This checks every visible required
+        // field plus the three photos, then lists everything that's missing.
+        // ---------------------------------------------------------------
+
+        // Several labels repeat ("Number at Meal Break" x3), so name them properly.
+        const FIELD_NAMES = {
+            scannersNum: 'Scanners - number at meal break',
+            radiosNum: 'Radios - number at meal break',
+            printersNum: 'Printers - number at meal break',
+            scannerMissing: 'Scanners - why the count changed',
+            radioMissing: 'Radios - why the count changed',
+            printerMissing: 'Printers - why the count changed',
+            scannerPhotoInput: 'Scanner photo',
+            radioPhotoInput: 'Radio photo',
+            printerPhotoInput: 'Printer photo'
+        };
+
+        function isVisible(el) {
+            return !!(el && (el.offsetParent !== null || el.getClientRects().length));
+        }
+
+        function fieldLabel(el) {
+            if (FIELD_NAMES[el.id]) return FIELD_NAMES[el.id];
+            const l = document.querySelector('label[for="' + el.id + '"]');
+            const raw = l ? l.textContent : (el.placeholder || el.name || el.id);
+            return raw.replace(/\*/g, '').replace(/\s+/g, ' ').trim();
+        }
+
+        function clearInvalid() {
+            document.querySelectorAll('.field-invalid').forEach(el => el.classList.remove('field-invalid'));
+            document.getElementById('validationSummary').classList.remove('show');
+            document.getElementById('validationList').innerHTML = '';
+        }
+
+        function findMissing() {
+            const form = document.getElementById('checklistForm');
+            const missing = [];
+
+            form.querySelectorAll('input[required], select[required], textarea[required]').forEach(el => {
+                if (!isVisible(el)) return;               // hidden section - not applicable
+                if (el.value && el.value.trim() !== '') return;
+                missing.push({ el: el, label: fieldLabel(el) });
+            });
+
+            // Photos live outside the required-attribute system - the file input
+            // is styled away and the real evidence is whether we read the file.
+            [['scanner', 'scannerPhotoInput'], ['radio', 'radioPhotoInput'], ['printer', 'printerPhotoInput']]
+                .forEach(([key, inputId]) => {
+                    if (photoData[key]) return;
+                    const input = document.getElementById(inputId);
+                    missing.push({
+                        el: input.closest('.file-upload') || input,
+                        label: FIELD_NAMES[inputId]
+                    });
+                });
+
+            return missing;
+        }
+
+        function showMissing(missing) {
+            const list = document.getElementById('validationList');
+            list.innerHTML = '';
+            missing.forEach(item => {
+                item.el.classList.add('field-invalid');
+                const li = document.createElement('li');
+                li.textContent = item.label;
+                li.addEventListener('click', () => {
+                    item.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (item.el.focus) item.el.focus();
+                });
+                list.appendChild(li);
+            });
+
+            const summary = document.getElementById('validationSummary');
+            summary.classList.add('show');
+            summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Take the operator straight to the first thing that needs attention.
+            setTimeout(() => {
+                missing[0].el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                if (missing[0].el.focus) missing[0].el.focus();
+            }, 400);
+        }
+
+        // Clear a field's highlight as soon as it's filled in.
+        document.getElementById('checklistForm').addEventListener('input', e => {
+            if (e.target.classList) e.target.classList.remove('field-invalid');
+        });
+        document.getElementById('checklistForm').addEventListener('change', e => {
+            if (e.target.classList) e.target.classList.remove('field-invalid');
+            const wrap = e.target.closest && e.target.closest('.file-upload');
+            if (wrap) wrap.classList.remove('field-invalid');
+        });
 
         document.getElementById('checklistForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             console.log('=== FORM SUBMISSION STARTED ===');
+
+            clearInvalid();
+            const missing = findMissing();
+            if (missing.length) {
+                console.log('Blocked - missing:', missing.map(m => m.label));
+                showMissing(missing);
+                return;
+            }
 
             // Show loading state
             const submitBtn = this.querySelector('button[type="submit"]');
@@ -841,6 +1015,12 @@
                 console.log('Step 1: Collecting form data...');
                 const formData = new FormData(this);
                 const data = Object.fromEntries(formData);
+
+                // File inputs don't survive Object.fromEntries as anything useful,
+                // so the photos are attached from the reader results above.
+                data.scannerPhoto = photoData.scanner;
+                data.radioPhoto = photoData.radio;
+                data.printerPhoto = photoData.printer;
                 console.log('Form data collected:', data);
                 console.log('Site:', data.site);
                 console.log('Shift:', data.shift);
