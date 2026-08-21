@@ -356,7 +356,7 @@
 
                 <div class="form-group">
                     <label for="shift">Shift <span class="required">*</span></label>
-                    <select id="shift" name="shift" required>
+                    <select id="shift" name="shift" required onchange="updateVisibility()">
                         <option value="">-- Select Shift --</option>
                         <option value="Day">Day</option>
                         <option value="Afternoon">Afternoon</option>
@@ -394,13 +394,25 @@
 
                 <div class="two-columns">
                     <div class="form-group">
-                        <label>Picks at beginning of shift</label>
+                        <label>Backloads at beginning of shift</label>
                         <span class="previous-count">Auto-filled from last shift</span>
-                        <input type="number" id="picksBegin" name="picksBegin" placeholder="Select a site" readonly>
+                        <input type="number" id="backloadsBegin" name="backloadsBegin" placeholder="Select a site" readonly>
                     </div>
                     <div class="form-group">
-                        <label for="picksEnd">Picks at end of shift <span class="required">*</span></label>
-                        <input type="number" id="picksEnd" name="picksEnd" placeholder="Enter number" required>
+                        <label for="backloadsEnd">Backloads at end of shift <span class="required">*</span></label>
+                        <input type="number" id="backloadsEnd" name="backloadsEnd" placeholder="Enter number" required>
+                    </div>
+                </div>
+
+                <div class="two-columns">
+                    <div class="form-group">
+                        <label>Containers at beginning of shift</label>
+                        <span class="previous-count">Auto-filled from last shift</span>
+                        <input type="number" id="containerPicksBegin" name="containerPicksBegin" placeholder="Select a site" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="containerPicksEnd">Containers at end of shift <span class="required">*</span></label>
+                        <input type="number" id="containerPicksEnd" name="containerPicksEnd" placeholder="Enter number" required>
                     </div>
                 </div>
 
@@ -413,8 +425,37 @@
                     </select>
                 </div>
 
+                <!-- CONTAINERS ON DOCK - PM (Afternoon) SHIFT ONLY -->
+                <div id="containersSection" class="hidden">
+                    <div class="section-header">3. CONTAINERS ON DOCK</div>
+                    <div class="alert alert-info">This section applies to the Afternoon (PM) shift only.</div>
+
+                    <div class="form-group">
+                        <label for="containersOnDockChecked">Have the Containers on Dock Checks been completed? <span class="required">*</span></label>
+                        <select id="containersOnDockChecked" name="containersOnDockChecked" onchange="updateVisibility()">
+                            <option value="">-- Select --</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="containersMissing">Any containers missing that should be on dock? <span class="required">*</span></label>
+                        <select id="containersMissing" name="containersMissing" onchange="updateVisibility()">
+                            <option value="">-- Select --</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+
+                    <div id="missingOrdersGroup" class="form-group hidden">
+                        <label for="missingOrderNumbers">Which order numbers? <span class="required">*</span></label>
+                        <textarea id="missingOrderNumbers" name="missingOrderNumbers" placeholder="List the order numbers of the missing containers"></textarea>
+                    </div>
+                </div>
+
                 <!-- STAFFING -->
-                <div class="section-header">3. STAFFING</div>
+                <div class="section-header">4. STAFFING</div>
 
                 <div class="form-group">
                     <label for="absences">Any Absences Today? <span class="required">*</span></label>
@@ -451,7 +492,7 @@
                 </div>
 
                 <!-- HANDOVER & PROBLEMS -->
-                <div class="section-header">4. HANDOVER NOTES & PROBLEMS</div>
+                <div class="section-header">5. HANDOVER NOTES &amp; PROBLEMS</div>
 
                 <div class="form-group">
                     <label for="handoverNotes">Handover Notes for Next Shift</label>
@@ -469,7 +510,7 @@
                 </div>
 
                 <!-- EQUIPMENT -->
-                <div class="section-header">5. EQUIPMENT - SCANNERS, RADIOS & PRINTERS</div>
+                <div class="section-header">6. EQUIPMENT - SCANNERS, RADIOS &amp; PRINTERS</div>
 
                 <div class="alert alert-warning">⚠️ If equipment counts at meal break differ from the last shift's meal break count, you must explain why.</div>
 
@@ -563,7 +604,7 @@
                 </div>
 
                 <!-- COMMUNICATIONS -->
-                <div class="section-header">6. COMMUNICATIONS & REPORTS</div>
+                <div class="section-header">7. COMMUNICATIONS &amp; REPORTS</div>
 
                 <div class="form-group">
                     <label for="kpiExplanations">KPIs - Explanations (if under 80 moves)</label>
@@ -643,7 +684,8 @@
         function clearPreviousShift(message) {
             previousShiftData = { scannersNum: null, radiosNum: null, printersNum: null };
             document.getElementById('putawaysBegin').value = '';
-            document.getElementById('picksBegin').value = '';
+            document.getElementById('backloadsBegin').value = '';
+            document.getElementById('containerPicksBegin').value = '';
             ['prevScanners', 'prevRadios', 'prevPrinters'].forEach(id => setPrevLabel(id, null));
             document.getElementById('previousShiftBanner').textContent = message;
             updateVisibility();
@@ -664,17 +706,19 @@
 
                 if (!res.ok || !prev.found) {
                     clearPreviousShift('No previous shift on record for ' + site + '. Enter the beginning-of-shift numbers manually.');
-                    document.getElementById('putawaysBegin').removeAttribute('readonly');
-                    document.getElementById('picksBegin').removeAttribute('readonly');
-                    document.getElementById('putawaysBegin').placeholder = 'Enter number';
-                    document.getElementById('picksBegin').placeholder = 'Enter number';
+                    ['putawaysBegin', 'backloadsBegin', 'containerPicksBegin'].forEach(id => {
+                        const el = document.getElementById(id);
+                        el.removeAttribute('readonly');
+                        el.placeholder = 'Enter number';
+                    });
                     return;
                 }
 
-                document.getElementById('putawaysBegin').setAttribute('readonly', 'readonly');
-                document.getElementById('picksBegin').setAttribute('readonly', 'readonly');
+                ['putawaysBegin', 'backloadsBegin', 'containerPicksBegin'].forEach(id =>
+                    document.getElementById(id).setAttribute('readonly', 'readonly'));
                 document.getElementById('putawaysBegin').value = prev.putawaysEnd === null ? '' : prev.putawaysEnd;
-                document.getElementById('picksBegin').value = prev.picksEnd === null ? '' : prev.picksEnd;
+                document.getElementById('backloadsBegin').value = prev.backloadsEnd === null || prev.backloadsEnd === undefined ? '' : prev.backloadsEnd;
+                document.getElementById('containerPicksBegin').value = prev.containerPicksEnd === null || prev.containerPicksEnd === undefined ? '' : prev.containerPicksEnd;
 
                 previousShiftData = {
                     scannersNum: prev.scannersNum,
@@ -695,12 +739,44 @@
             } catch (err) {
                 console.warn('Could not load previous shift:', err);
                 clearPreviousShift('Could not reach the server to load the last shift. Enter the beginning-of-shift numbers manually.');
-                document.getElementById('putawaysBegin').removeAttribute('readonly');
-                document.getElementById('picksBegin').removeAttribute('readonly');
+                ['putawaysBegin', 'backloadsBegin', 'containerPicksBegin'].forEach(id =>
+                    document.getElementById(id).removeAttribute('readonly'));
+            }
+        }
+
+        // Required-ness has to follow visibility. A hidden field carrying the
+        // `required` attribute blocks submit with a validation message the user
+        // cannot see, so these are toggled in code rather than set in the markup.
+        function setRequired(id, on) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            if (on) {
+                el.setAttribute('required', 'required');
+            } else {
+                el.removeAttribute('required');
+                el.value = '';          // don't submit stale answers from a hidden field
             }
         }
 
         function updateVisibility() {
+            // ---- Containers on dock: Afternoon (PM) shift only ----
+            const isPMShift = document.getElementById('shift').value === 'Afternoon';
+            document.getElementById('containersSection').classList.toggle('hidden', !isPMShift);
+
+            // Clear the whole block when it doesn't apply, so a shift changed from
+            // Afternoon to Day can't leave container answers behind.
+            if (!isPMShift) {
+                document.getElementById('containersOnDockChecked').value = '';
+                document.getElementById('containersMissing').value = '';
+            }
+            setRequired('containersOnDockChecked', isPMShift);
+            setRequired('containersMissing', isPMShift);
+
+            const containersMissing = document.getElementById('containersMissing').value;
+            const needOrderNumbers = isPMShift && containersMissing === 'Yes';
+            document.getElementById('missingOrdersGroup').classList.toggle('hidden', !needOrderNumbers);
+            setRequired('missingOrderNumbers', needOrderNumbers);
+
             // Show/hide absence names
             const absencesValue = document.getElementById('absences').value;
             document.getElementById('absentNamesGroup').classList.toggle('hidden', absencesValue !== 'Yes');
